@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../helpers/database_helper.dart';
 import '../models/genre.dart';
 import '../models/movie.dart';
+import 'movie_page.dart';  // Import the new page
 
 class HomePage extends StatefulWidget {
   @override
@@ -162,73 +163,83 @@ class MovieItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7), // Adjust the opacity here
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: 10.0),
-            alignment: Alignment.center,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Image.asset(
-                  movie.photoPath,
-                  fit: BoxFit.cover,
-                  width: MediaQuery.of(context).size.width * 0.8, // Adjust the width here for grid layout
-                  height: 200,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MoviePage(movieId: movie.id!),
+          ),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.7), // Adjust the opacity here
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 10.0),
+              alignment: Alignment.center,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Image.asset(
+                    movie.photoPath,
+                    fit: BoxFit.cover,
+                    width: MediaQuery.of(context).size.width * 0.8, // Adjust the width here for grid layout
+                    height: 200,
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 10.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  movie.title,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
+            SizedBox(height: 10.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    movie.title,
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 5.0),
-                Text(
-                  '${movie.year} | ${movie.duration}',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                SizedBox(height: 5.0),
-                FutureBuilder<List<Genre>>(
-                  future: DatabaseHelper().getGenresForMovie(movie.id ?? 0),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      final genres = snapshot.data!;
-                      final genreNames = genres.map((genre) => genre.name).toList();
-                      final genreString = genreNames.join(', '); // Join genre names with commas
-                      return Text(
-                        '$genreString',
-                        style: TextStyle(fontSize: 14.0),
-                      );
-                    }
-                  },
-                ),
-              ],
+                  SizedBox(height: 5.0),
+                  Text(
+                    '${movie.year} | ${movie.duration}',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                  SizedBox(height: 5.0),
+                  FutureBuilder<List<Genre>>(
+                    future: DatabaseHelper().getGenresForMovie(movie.id ?? 0),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        final genres = snapshot.data!;
+                        final genreNames = genres.map((genre) => genre.name).toList();
+                        final genreString = genreNames.join(', '); // Join genre names with commas
+                        return Text(
+                          '$genreString',
+                          style: TextStyle(fontSize: 14.0),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(height: 10.0),
-        ],
+            SizedBox(height: 10.0),
+          ],
+        ),
       ),
     );
   }

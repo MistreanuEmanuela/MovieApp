@@ -203,6 +203,27 @@ class DatabaseHelper {
       return Genre.fromMap(maps[i]);
     });
   }
+   Future<List<Actor>> actors() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('actors');
+    return List.generate(maps.length, (i) {
+      return Actor.fromMap(maps[i]);
+    });
+  }
+ Future<List<Role>> roles() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('roles');
+    return List.generate(maps.length, (i) {
+      return Role.fromMap(maps[i]);
+    });
+  }
+ Future<List<MovieActor>> movieActor() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('movie_actor');
+    return List.generate(maps.length, (i) {
+      return MovieActor.fromMap(maps[i]);
+    });
+  }
 
 Future<List<Movie>> moviesByYearDesc() async {
   final db = await database;
@@ -272,4 +293,77 @@ Future<List<Genre>> getAllGenres() async {
       return Movie.fromMap(maps[i]);
     });
   }
+
+   Future<Movie> getMovieById(int id) async {
+    final db = await database;
+    final maps = await db.query(
+      'movies',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Movie.fromMap(maps.first);
+    } else {
+      throw Exception('Movie not found');
+    }
+  }
+
+ Future<List<Producer>> getProducersForMovie(int movieId) async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.rawQuery(
+    '''
+    SELECT producers.* FROM producers
+    INNER JOIN movie_producer ON producers.id = movie_producer.id_producer
+    WHERE movie_producer.id_movie = ?
+    ''',
+    [movieId],
+  );
+
+  if (maps.isNotEmpty) {
+    return List.generate(maps.length, (i) {
+      return Producer.fromMap(maps[i]);
+    });
+  } else {
+    return []; // Return an empty list if no producers found
+  }
+}
+  Future<List<Actor>> getActorsForMovie(int movieId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
+      SELECT actors.* FROM actors
+      INNER JOIN movie_actor ON actors.id = movie_actor.id_actor
+      WHERE movie_actor.id_movie = ?
+      ''',
+      [movieId],
+    );
+
+     if (maps.isNotEmpty) {
+    return List.generate(maps.length, (i) {
+      return Actor.fromMap(maps[i]);
+    });
+  } else {
+    return []; // Return an empty list if no producers found
+  }
+  }
+
+  Future<Role> getRoleForMovieActor(int movieId, int actorId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
+      SELECT roles.* FROM roles
+      INNER JOIN movie_actor ON roles.id = movie_actor.id_role
+      WHERE movie_actor.id_movie = ? AND movie_actor.id_actor = ?
+      ''',
+      [movieId, actorId],
+    );
+
+    if (maps.isNotEmpty) {
+      return Role.fromMap(maps.first);
+    } else {
+      throw Exception('Role not found for the movie and actor');
+    }
+  }
+
 }

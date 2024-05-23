@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/models/movie.dart';
 import './pages/register_page.dart'; // Import the register page
 import './pages/login_page.dart';
 import './insert_data.dart';
 import './pages/homepage.dart';
+import './pages/movie_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,7 +41,19 @@ class MyApp extends StatelessWidget {
     routes: {
         '/register': (context) => RegisterPage(), // Add route for register page
         '/login':(context) => LoginPage(),
-         '/homepage':(context) => HomePage()
+         '/homepage':(context) => HomePage(),
+      },
+        onGenerateRoute: (settings) {
+        if (settings.name == '/moviepage') {
+          final args = settings.arguments as MoviePageArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return MoviePage(movieId: args.movieId);
+            },
+          );
+        }
+        assert(false, 'Need to implement ${settings.name}');
+        return null;
       },
     );
   }
@@ -148,4 +162,10 @@ Widget build(BuildContext context) {
 
   );
 }
+}
+
+class MoviePageArguments {
+  final int movieId;
+
+  MoviePageArguments(this.movieId);
 }

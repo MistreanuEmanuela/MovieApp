@@ -39,13 +39,13 @@ Future<void> insertInitialData() async {
 var actor = Actor(
   name: 'Leonardo DiCaprio',
   bio: 'An American actor and film producer.',
-  photoPath: 'images/actors/leo.jpg', // Relative to the lib directory
+  photoPath: 'lib/images/actors/leo.jpg', // Relative to the lib directory
 );
 
 var producer = Producer(
   name: 'Christopher Nolan',
   bio: 'An English-American film director, producer, and screenwriter.',
-  photoPath: 'images/producers/nolan.jpg', // Relative to the lib directory
+  photoPath: 'lib/images/producers/nolan.jpg', // Relative to the lib directory
 );
 
   var role = Role(
@@ -53,14 +53,14 @@ var producer = Producer(
   );
 
   var movieActor = MovieActor(
-    idMovie: 1,
-    idActor: 1,
+    idMovie: 7,
+    idActor: 2,
     idRole: 1,
   );
 
   var movieProducer = MovieProducer(
-    idMovie: 1,
-    idProducer: 1,
+    idMovie: 6,
+    idProducer: 2,
   );
 
   var genre = Genre(
@@ -82,6 +82,7 @@ var producer = Producer(
     idMovie: 8,
     idGenre: 2,
   );
+  
   // await dbHelper.insertMovie(movie);
   // await dbHelper.insertMovie(movie1);
   //   await dbHelper.insertMovie(movie2);
@@ -91,13 +92,17 @@ var producer = Producer(
   // await dbHelper.insertRole(role);
   // await dbHelper.insertMovieActor(movieActor);
   // await dbHelper.insertMovieProducer(movieProducer);
+  //   await dbHelper.insertMovieProducer(movieProducer);
+  //     await dbHelper.insertMovieProducer(movieProducer);
+  //       await dbHelper.insertMovieProducer(movieProducer);
   // await dbHelper.insertGenre(genre);
   // await dbHelper.insertGenreMovie(genreMovie);
   //   await dbHelper.insertGenre(genre1);
   // await dbHelper.insertGenreMovie(genreMovie1);
   //   await dbHelper.insertGenre(genre2);
   // await dbHelper.insertGenreMovie(genreMovie1);
-
+//  await dbHelper.insertActor(actor);
+// await dbHelper.insertMovieActor(movieActor);
   var users = await dbHelper.users();
 
   print(users);
@@ -124,8 +129,24 @@ var producer = Producer(
          print("name: ${genre.name}");
     }
 
-  }
+  
+   var actors = await dbHelper.actors();
+    for (var actor in actors) {
+    print("Id: ${actor.id}");  
+    print("name: ${actor.name}");
+    }
 
+  }
+  
+var roles = await dbHelper.movieActor();
+    for (var actor in roles) {
+    print("Id: ${actor.id}");  
+    print("name: ${actor.idActor}");
+    print("name: ${actor.idMovie}");
+    print("name: ${actor.idRole}");
+    }
+
+  
   // Delete all movies
   // await dbHelper.deleteAllMovies();
 }

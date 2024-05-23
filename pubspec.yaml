@@ -98,3 +98,5 @@ flutter:
     - assets/images/first_page.jpg
     - assets/images/photo.png
     - lib/images/movies/inception.png
+    - lib/images/producers/nolan.jpg
+    - lib/images/actors/leo.jpg
