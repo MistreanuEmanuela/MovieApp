@@ -76,27 +76,27 @@ var producer = Producer(
 
   var genreMovie1 = GenreMovie(
     idMovie: 7,
-    idGenre: 2,
+    idGenre: 4,
   );
   var genreMovie2 = GenreMovie(
     idMovie: 8,
-    idGenre: 3,
+    idGenre: 2,
   );
-  await dbHelper.insertMovie(movie);
-  await dbHelper.insertMovie(movie1);
-    await dbHelper.insertMovie(movie2);
+  // await dbHelper.insertMovie(movie);
+  // await dbHelper.insertMovie(movie1);
+  //   await dbHelper.insertMovie(movie2);
       
   // await dbHelper.insertActor(actor);
   // await dbHelper.insertProducer(producer);
   // await dbHelper.insertRole(role);
   // await dbHelper.insertMovieActor(movieActor);
   // await dbHelper.insertMovieProducer(movieProducer);
-  await dbHelper.insertGenre(genre);
-  await dbHelper.insertGenreMovie(genreMovie);
-    await dbHelper.insertGenre(genre1);
-  await dbHelper.insertGenreMovie(genreMovie1);
-    await dbHelper.insertGenre(genre2);
-  await dbHelper.insertGenreMovie(genreMovie2);
+  // await dbHelper.insertGenre(genre);
+  // await dbHelper.insertGenreMovie(genreMovie);
+  //   await dbHelper.insertGenre(genre1);
+  // await dbHelper.insertGenreMovie(genreMovie1);
+  //   await dbHelper.insertGenre(genre2);
+  // await dbHelper.insertGenreMovie(genreMovie1);
 
   var users = await dbHelper.users();
 
@@ -118,6 +118,12 @@ var producer = Producer(
     print("Duration: ${movie.duration}");
     print("Photo Path: ${movie.photoPath}");
     print("---------------------");
+  var genres = await dbHelper.genres();
+    for (var genre in genres) {
+    print("Id: ${genre.id}");  
+         print("name: ${genre.name}");
+    }
+
   }
 
   // Delete all movies

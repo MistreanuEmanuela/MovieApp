@@ -195,6 +195,15 @@ class DatabaseHelper {
       return Movie.fromMap(maps[i]);
     });
   }
+
+    Future<List<Genre>> genres() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('genres');
+    return List.generate(maps.length, (i) {
+      return Genre.fromMap(maps[i]);
+    });
+  }
+
 Future<List<Movie>> moviesByYearDesc() async {
   final db = await database;
   final List<Map<String, dynamic>> maps = await db.query(
@@ -236,5 +245,31 @@ Future<void> deleteMovie(int id) async {
       );
     });
   }
-  
+Future<List<Genre>> getAllGenres() async {
+  final db = await database;
+  final List<Map<String, dynamic>> genreMaps = await db.query('genres');
+  return List.generate(genreMaps.length, (i) {
+    return Genre(
+      id: genreMaps[i]['id'],
+      name: genreMaps[i]['name'],
+    );
+  });
+}
+    Future<List<Movie>> getMoviesByGenre(String genreName) async {
+    final db = await database;
+    
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
+      SELECT movies.* FROM movies 
+      INNER JOIN genre_movies ON movies.id = genre_movies.id_movie
+      INNER JOIN genres ON genre_movies.id_genre = genres.id
+      WHERE genres.name = ?
+      ''',
+      [genreName],
+    );
+
+    return List.generate(maps.length, (i) {
+      return Movie.fromMap(maps[i]);
+    });
+  }
 }

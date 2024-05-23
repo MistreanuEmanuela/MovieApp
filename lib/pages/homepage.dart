@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../helpers/database_helper.dart';
-import '../models/movie.dart';
 import '../models/genre.dart';
+import '../models/movie.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,12 +9,108 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late List<Genre> _genres = [];
   late Future<List<Movie>> _moviesFuture;
+  late DatabaseHelper _databaseHelper;
+  String _selectedGenre = 'All';
 
   @override
   void initState() {
     super.initState();
-    _moviesFuture = DatabaseHelper().moviesByYearDesc();
+    _databaseHelper = DatabaseHelper();
+    _fetchGenres();
+    _moviesFuture = _fetchMovies();
+  }
+
+  Future<void> _fetchGenres() async {
+    final genres = await _databaseHelper.getAllGenres();
+    setState(() {
+      _genres = genres;
+    });
+  }
+
+  Future<List<Movie>> _fetchMovies() async {
+    if (_selectedGenre == 'All') {
+      return await _databaseHelper.movies();
+    } else {
+      return await _databaseHelper.getMoviesByGenre(_selectedGenre);
+    }
+  }
+
+  Widget _buildGenreButtons() {
+    List<Widget> buttons = [];
+
+    buttons.add(
+      ElevatedButton(
+        onPressed: () {
+          setState(() {
+            _selectedGenre = 'All';
+            _moviesFuture = _fetchMovies();
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _selectedGenre == 'All' ? Colors.yellow : null,
+        ),
+        child: Text('All'),
+      ),
+    );
+
+    for (Genre genre in _genres) {
+      buttons.add(
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _selectedGenre = genre.name;
+              _moviesFuture = _fetchMovies();
+            });
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _selectedGenre == genre.name ? Colors.yellow : null,
+          ),
+          child: Text(genre.name),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: buttons.map((button) => Padding(padding: EdgeInsets.symmetric(horizontal: 4.0), child: button)).toList(),
+      ),
+    );
+  }
+
+  Widget _buildMovieList() {
+    return FutureBuilder<List<Movie>>(
+      future: _moviesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+        } else {
+          final movies = snapshot.data!;
+          return ListView.builder(
+            itemCount: (movies.length / 2).ceil(),
+            itemBuilder: (context, index) {
+              final startIndex = index * 2;
+              final endIndex = (index * 2) + 2;
+              return Row(
+                children: [
+                  for (var i = startIndex; i < endIndex && i < movies.length; i++)
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: MovieItem(movie: movies[i]),
+                      ),
+                    ),
+                ],
+              );
+            },
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -26,98 +122,25 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/first_page.jpg'),
+            image: AssetImage('assets/images/first_page.jpg'), // Replace 'background_image.jpg' with your image asset
             fit: BoxFit.cover,
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child: SafeArea(
-            child: FutureBuilder<List<Movie>>(
-              future: _moviesFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
-                  final movies = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: movies.length,
-                    itemBuilder: (context, index) {
-                      final movie = movies[index];
-                      return Container(
-                        margin: EdgeInsets.only(bottom: 20.0),
-                        padding: EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 5.0,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: Image.asset(
-                                movie.photoPath,
-                                fit: BoxFit.cover,
-                                height: 200,
-                                width: MediaQuery.of(context).size.width,
-                              ),
-                            ),
-                            SizedBox(height: 10.0),
-                            Text(
-                              movie.title,
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 5.0),
-                            Text(
-                              '${movie.year} | ${movie.duration}',
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            SizedBox(height: 5.0),
-                            FutureBuilder<List<Genre>>(
-                              future: DatabaseHelper().getGenresForMovie(movie.id ?? 0),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else {
-                                  final genres = snapshot.data!;
-                                  return Wrap(
-                                    spacing: 5.0,
-                                    children: genres
-                                        .map(
-                                          (genre) => Chip(
-                                            label: Text(
-                                              genre.name,
-                                              style: TextStyle(fontSize: 12.0),
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
-                                  );
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                }
-              },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Choose a Genre:',
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white), // Adjust color as needed
+                ),
+                SizedBox(height: 16.0),
+                _buildGenreButtons(),
+                SizedBox(height: 16.0),
+                Expanded(child: _buildMovieList()),
+              ],
             ),
           ),
         ),
@@ -128,7 +151,85 @@ class _HomePageState extends State<HomePage> {
 
 void main() {
   runApp(MaterialApp(
-    title: 'Movie App',
     home: HomePage(),
   ));
+}
+
+class MovieItem extends StatelessWidget {
+  final Movie movie;
+
+  const MovieItem({Key? key, required this.movie}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7), // Adjust the opacity here
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 10.0),
+            alignment: Alignment.center,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Image.asset(
+                  movie.photoPath,
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width * 0.8, // Adjust the width here for grid layout
+                  height: 200,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 10.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  movie.title,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 5.0),
+                Text(
+                  '${movie.year} | ${movie.duration}',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                SizedBox(height: 5.0),
+                FutureBuilder<List<Genre>>(
+                  future: DatabaseHelper().getGenresForMovie(movie.id ?? 0),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      final genres = snapshot.data!;
+                      final genreNames = genres.map((genre) => genre.name).toList();
+                      final genreString = genreNames.join(', '); // Join genre names with commas
+                      return Text(
+                        '$genreString',
+                        style: TextStyle(fontSize: 14.0),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10.0),
+        ],
+      ),
+    );
+  }
 }
