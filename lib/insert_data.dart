@@ -144,11 +144,14 @@ var producer = Producer(
   await dbHelper.deleteGenre(9);
   await dbHelper.deleteGenre(10);
   await dbHelper.deleteGenre(11);
-  var genres = await dbHelper.genres();
-    for (var genre in genres) {
-    print("Id: ${genre.id}");  
-         print("name: ${genre.name}");
-    }
+var favoriteMovies = await dbHelper.getAllFavoriteMovies();
+for (var movie in favoriteMovies) {
+  print("Movie ID: ${movie['id_movie']}");  
+  print("User ID: ${movie['id_user']}");
+  // Print other movie details as needed
+}
+await dbHelper.deleteFavoriteMovie(1, 1);
+await dbHelper.deleteFavoriteMovie(2, 1);
 
   
 //    var actors = await dbHelper.actors();

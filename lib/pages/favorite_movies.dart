@@ -2,90 +2,34 @@ import 'package:flutter/material.dart';
 import '../helpers/database_helper.dart';
 import '../models/genre.dart';
 import '../models/movie.dart';
-import 'movie_page.dart';  // Import the new page
-import '../pages/favorite_movies.dart';
+import 'movie_page.dart'; 
+import '../user_preferinces.dart';
 
-class HomePage extends StatefulWidget {
+class FavoriteMoviesPage extends StatefulWidget {
+
   @override
-  _HomePageState createState() => _HomePageState();
+  _FavoriteMoviesPage createState() => _FavoriteMoviesPage();
 }
 
-class _HomePageState extends State<HomePage> {
-  late List<Genre> _genres = [];
+class _FavoriteMoviesPage extends State<FavoriteMoviesPage> {
+  late int userId;
   late Future<List<Movie>> _moviesFuture;
   late DatabaseHelper _databaseHelper;
-  String _selectedGenre = 'All';
 
   @override
   void initState() {
     super.initState();
     _databaseHelper = DatabaseHelper();
-    _fetchGenres();
-    _moviesFuture = _fetchMovies();
-  }
-
-  Future<void> _fetchGenres() async {
-    final genres = await _databaseHelper.getAllGenres();
-    setState(() {
-      _genres = genres;
+    UserPreferences.getUserId().then((value) {
+      setState(() {
+        userId = value!;
+        _moviesFuture = _fetchMovies();
+      });
     });
   }
 
- Future<List<Movie>> _fetchMovies() async {
-  List<Movie> movies;
-  if (_selectedGenre == 'All') {
-    movies = await _databaseHelper.movies();
-  } else {
-    movies = await _databaseHelper.getMoviesByGenre(_selectedGenre);
-  }
-  
-  // Filter out duplicates
-  movies = movies.toSet().toList(); // Convert to Set to remove duplicates, then back to List
-  
-  return movies;
-}
-
-  Widget _buildGenreButtons() {
-    List<Widget> buttons = [];
-
-    buttons.add(
-      ElevatedButton(
-        onPressed: () {
-          setState(() {
-            _selectedGenre = 'All';
-            _moviesFuture = _fetchMovies();
-          });
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _selectedGenre == 'All' ? Colors.yellow : null,
-        ),
-        child: Text('All'),
-      ),
-    );
-
-    for (Genre genre in _genres) {
-      buttons.add(
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              _selectedGenre = genre.name;
-              _moviesFuture = _fetchMovies();
-            });
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _selectedGenre == genre.name ? Colors.yellow : null,
-          ),
-          child: Text(genre.name),
-        ),
-      );
-    }
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: buttons.map((button) => Padding(padding: EdgeInsets.symmetric(horizontal: 4.0), child: button)).toList(),
-      ),
-    );
+  Future<List<Movie>> _fetchMovies() async {
+    return _databaseHelper.getFavoriteMoviesForUser(userId);
   }
 
   Widget _buildMovieList() {
@@ -130,13 +74,9 @@ class _HomePageState extends State<HomePage> {
         PopupMenuButton<String>(
           onSelected: (value) {
             switch (value) {
-              case 'Favorite Movies':
-               Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FavoriteMoviesPage(),
-          ),
-        );
+              case 'Settings':
+                // Navigate to Settings page
+                // Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage()));
                 break;
               case 'About':
                 // Navigate to About page
@@ -147,8 +87,8 @@ class _HomePageState extends State<HomePage> {
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
             PopupMenuItem<String>(
-              value: 'Favorite Movies',
-              child: Text('Favorite Movies'),
+              value: 'Settings',
+              child: Text('Settings'),
             ),
             PopupMenuItem<String>(
               value: 'About',
@@ -172,12 +112,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Choose a Genre:',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white), // Adjust color as needed
-                ),
-                SizedBox(height: 16.0),
-                _buildGenreButtons(),
+             
                 SizedBox(height: 16.0),
                 Expanded(child: _buildMovieList()),
               ],
@@ -187,12 +122,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: HomePage(),
-  ));
 }
 
 class MovieItem extends StatelessWidget {

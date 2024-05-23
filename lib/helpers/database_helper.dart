@@ -216,6 +216,12 @@ class DatabaseHelper {
       return Genre.fromMap(maps[i]);
     });
   }
+
+     Future<List<Map<String, dynamic>>> getAllFavoriteMovies() async {
+    final db = await database;
+    return db.query('favorite_movies');
+    
+  }
    Future<List<Actor>> actors() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('actors');
@@ -256,6 +262,8 @@ Future<void> deleteMovie(int id) async {
       whereArgs: [id],
     );
   }
+
+
 Future<void> deleteGenre(int id) async {
     final db = await database;
     await db.delete(
