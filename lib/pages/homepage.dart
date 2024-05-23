@@ -173,7 +173,7 @@ class MovieItem extends StatelessWidget {
         );
       },
       child: Container(
-        margin: EdgeInsets.all(8.0),
+        margin: EdgeInsets.all(2.0),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.7), // Adjust the opacity here
           borderRadius: BorderRadius.circular(10.0),
@@ -213,7 +213,7 @@ class MovieItem extends StatelessWidget {
                   SizedBox(height: 5.0),
                   Text(
                     '${movie.year} | ${movie.duration}',
-                    style: TextStyle(fontSize: 16.0),
+                    style: TextStyle(fontSize: 14.0),
                   ),
                   SizedBox(height: 5.0),
                   FutureBuilder<List<Genre>>(

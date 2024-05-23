@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../helpers/database_helper.dart';
 import '../models/user.dart';
 import 'dart:ui';
+import '../user_preferinces.dart';
+import 'package:collection/collection.dart';
+
 
 class LoginPage extends StatefulWidget {
   @override
@@ -14,15 +17,18 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
 
- void _login() async {
+void _login() async {
   if (_formKey.currentState!.validate()) {
     String username = _usernameController.text;
     String password = _passwordController.text;
 
     List<User> users = await _databaseHelper.users();
-    bool userExists = users.any((user) => user.username == username && user.password == password);
+    User? currentUser = users.firstWhereOrNull((user) => user.username == username && user.password == password);
 
-    if (userExists) {
+    if (currentUser != null) {
+      // Save user ID locally
+      await UserPreferences.saveUserId(currentUser!.id!);
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login successful!')));
 
       // Navigate to the home page or another screen after successful login

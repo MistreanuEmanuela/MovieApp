@@ -27,7 +27,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     return openDatabase(
-      join(await getDatabasesPath(), 'movie_app.db'),
+      join(await getDatabasesPath(), 'movie_app1.db'),
       onCreate: (db, version) async {
         await _createTables(db);
       },
@@ -73,6 +73,19 @@ class DatabaseHelper {
       "CREATE TABLE genre_movies(id INTEGER PRIMARY KEY, id_movie INTEGER, id_genre INTEGER, "
       "FOREIGN KEY(id_movie) REFERENCES movies(id), "
       "FOREIGN KEY(id_genre) REFERENCES genres(id))",
+    );
+
+      await db.execute(
+      "CREATE TABLE favorite_movies(id INTEGER PRIMARY KEY, id_movie INTEGER, id_user INTEGER, "
+      "FOREIGN KEY(id_movie) REFERENCES movies(id), "
+      "FOREIGN KEY(id_user) REFERENCES users(id))"
+    );
+
+    // Create favorite_actors table
+    await db.execute(
+      "CREATE TABLE favorite_actors(id INTEGER PRIMARY KEY, id_actor INTEGER, id_user INTEGER, "
+      "FOREIGN KEY(id_actor) REFERENCES actors(id), "
+      "FOREIGN KEY(id_user) REFERENCES users(id))"
     );
   }
 
@@ -365,5 +378,97 @@ Future<List<Genre>> getAllGenres() async {
       throw Exception('Role not found for the movie and actor');
     }
   }
+   Future<void> insertFavoriteMovie(int movieId, int userId) async {
+    final db = await database;
+    await db.insert(
+      'favorite_movies',
+      {'id_movie': movieId, 'id_user': userId},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> insertFavoriteActor(int actorId, int userId) async {
+    final db = await database;
+    await db.insert(
+      'favorite_actors',
+      {'id_actor': actorId, 'id_user': userId},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> deleteFavoriteMovie(int movieId, int userId) async {
+    final db = await database;
+    await db.delete(
+      'favorite_movies',
+      where: 'id_movie = ? AND id_user = ?',
+      whereArgs: [movieId, userId],
+    );
+  }
+
+  Future<void> deleteFavoriteActor(int actorId, int userId) async {
+    final db = await database;
+    await db.delete(
+      'favorite_actors',
+      where: 'id_actor = ? AND id_user = ?',
+      whereArgs: [actorId, userId],
+    );
+  }
+
+  Future<List<Movie>> getFavoriteMoviesForUser(int userId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'favorite_movies',
+      where: 'id_user = ?',
+      whereArgs: [userId],
+    );
+
+    final List<Movie> movies = [];
+    for (final map in maps) {
+      final int movieId = map['id_movie'];
+      final movie = await getMovieById(movieId);
+      movies.add(movie);
+    }
+    return movies;
+  }
+
+  Future<List<Actor>> getFavoriteActorsForUser(int userId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'favorite_actors',
+      where: 'id_user = ?',
+      whereArgs: [userId],
+    );
+  Future<Actor> getActorById(int id) async {
+      final db = await database;
+      final maps = await db.query(
+        'actors',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      if (maps.isNotEmpty) {
+        return Actor.fromMap(maps.first);
+      } else {
+        throw Exception('Actor not found');
+      }
+    }
+    final List<Actor> actors = [];
+    for (final map in maps) {
+      final int actorId = map['id_actor'];
+      final actor = await getActorById(actorId);
+      actors.add(actor);
+    }
+    return actors;
+  }
+Future<bool> checkPreferences(int userId, int movieId) async {
+  final db = await database;
+  final List<Map<String, dynamic>> result = await db.query(
+    'favorite_movies',
+    where: 'id_user = ? AND id_movie = ?',
+    whereArgs: [userId, movieId],
+  );
+
+  return result.isNotEmpty;
+}
 
 }

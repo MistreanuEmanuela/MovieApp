@@ -4,11 +4,31 @@ import '../models/genre.dart';
 import '../models/producer.dart'; // Import Producer model
 import '../helpers/database_helper.dart';
 import '../models/actor.dart';
+import '../models/role.dart';
+import '../user_preferinces.dart';
 
-class MoviePage extends StatelessWidget {
+class MoviePage extends StatefulWidget {
   final int movieId;
 
-  const MoviePage({Key? key, required this.movieId}) : super(key: key);
+  MoviePage({Key? key, required this.movieId}) : super(key: key);
+
+  @override
+  _MoviePageState createState() => _MoviePageState();
+}
+
+
+class _MoviePageState extends State<MoviePage> {
+  late int userId;
+
+  @override
+  void initState() {
+    super.initState();
+    UserPreferences.getUserId().then((value) {
+      setState(() {
+        userId = value!;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +54,10 @@ class MoviePage extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: FutureBuilder(
                 future: Future.wait([
-                  DatabaseHelper().getMovieById(movieId),
-                  DatabaseHelper().getGenresForMovie(movieId),
-                  DatabaseHelper().getProducersForMovie(movieId),
-                  DatabaseHelper().getActorsForMovie(movieId),// Fetch producers
+                  DatabaseHelper().getMovieById(widget.movieId),
+                  DatabaseHelper().getGenresForMovie(widget.movieId),
+                  DatabaseHelper().getProducersForMovie(widget.movieId),
+                  DatabaseHelper().getActorsForMovie(widget.movieId),
                 ]),
                 builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -49,7 +69,7 @@ class MoviePage extends StatelessWidget {
                   } else {
                     final Movie movie = snapshot.data![0] as Movie;
                     final List<Genre> genres = snapshot.data![1] as List<Genre>;
-                    final List<Producer> producers = snapshot.data![2] as List<Producer>; // Get producers
+                    final List<Producer> producers = snapshot.data![2] as List<Producer>;
                     final List<Actor> actors = snapshot.data![3] as List<Actor>;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,6 +140,36 @@ class MoviePage extends StatelessWidget {
                         ),
                         SizedBox(height: 16.0),
                         _buildActors(actors),
+                        SizedBox(height: 16.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                if (await DatabaseHelper().checkPreferences(userId, widget.movieId)) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Movie already favorited')),
+                                  );
+                                } else {
+                                  await DatabaseHelper().insertFavoriteMovie(widget.movieId, userId);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Movie favorited')),
+                                  );
+                                }
+                              },
+                              child: Text('Favorite'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                await DatabaseHelper().deleteFavoriteMovie(widget.movieId, userId);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Movie deleted')),
+                                );
+                              },
+                              child: Text('Delete'),
+                            ),
+                          ],
+                        ),
                       ],
                     );
                   }
@@ -159,32 +209,63 @@ class MoviePage extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildActors(List<Actor> actors) {
-    return Container(
-      height: 150, // Adjust the height according to your needs
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: actors.length,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage(actors[index].photoPath),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  actors[index].name,
-                  style: TextStyle(fontSize: 14.0, color: Colors.white),
-                ),
-              ],
+Widget _buildActors(List<Actor> actors) {
+  return Container(
+    height: 200, // Adjust the height according to your needs
+    child: SingleChildScrollView( // Wrap in a SingleChildScrollView to avoid overflow
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: actors.map((actor) {
+          return SizedBox(
+            width: 160, // Adjust the width according to your needs
+            child: Container(
+              margin: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundImage: AssetImage(actor.photoPath),
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    actor.name,
+                    style: TextStyle(fontSize: 14.0, color: Colors.black),
+                  ),
+                  SizedBox(height: 5.0),
+                  FutureBuilder<Role>(
+                    future: DatabaseHelper().getRoleForMovieActor(widget.movieId!, actor.id!), // Corrected 'movieId'
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData) {
+                        return Text('Role not found');
+                      } else {
+                        return Text(
+                          snapshot.data!.name,
+                          style: TextStyle(fontSize: 12.0),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           );
-        },
+        }).toList(),
       ),
-    );
-  }
+    ),
+  );
+}
+
+
 }

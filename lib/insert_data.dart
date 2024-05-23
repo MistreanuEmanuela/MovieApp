@@ -34,35 +34,43 @@ Future<void> insertInitialData() async {
   duration: '148 minutes',
   photoPath: 'lib/images/movies/inception.png', // Relative to the lib directory
 );
-
+ await dbHelper.insertMovie(movie);
+  await dbHelper.insertMovie(movie1);
+  await dbHelper.insertMovie(movie2);
 
 var actor = Actor(
   name: 'Leonardo DiCaprio',
   bio: 'An American actor and film producer.',
   photoPath: 'lib/images/actors/leo.jpg', // Relative to the lib directory
 );
-
+await dbHelper.insertActor(actor);
 var producer = Producer(
   name: 'Christopher Nolan',
   bio: 'An English-American film director, producer, and screenwriter.',
   photoPath: 'lib/images/producers/nolan.jpg', // Relative to the lib directory
 );
-
+await dbHelper.insertProducer(producer);
   var role = Role(
     name: 'Dominick Cobb',
   );
-
+await dbHelper.insertRole(role);
   var movieActor = MovieActor(
-    idMovie: 7,
-    idActor: 2,
+    idMovie: 1,
+    idActor: 1,
     idRole: 1,
   );
-
+await dbHelper.insertMovieActor(movieActor);
+await dbHelper.insertMovieActor(movieActor);
+await dbHelper.insertMovieActor(movieActor);
+await dbHelper.insertMovieActor(movieActor);
   var movieProducer = MovieProducer(
-    idMovie: 6,
-    idProducer: 2,
+    idMovie: 1,
+    idProducer: 1,
   );
-
+await dbHelper.insertMovieProducer(movieProducer);
+await dbHelper.insertMovieProducer(movieProducer);
+await dbHelper.insertMovieProducer(movieProducer);
+await dbHelper.insertMovieProducer(movieProducer);
   var genre = Genre(
     name: 'Science Fiction',
   );
@@ -70,17 +78,17 @@ var producer = Producer(
   var genre2= Genre(name:'drama' );
 
   var genreMovie = GenreMovie(
-    idMovie: 6,
+    idMovie: 1,
     idGenre: 1,
   );
 
   var genreMovie1 = GenreMovie(
-    idMovie: 7,
-    idGenre: 4,
+    idMovie: 2,
+    idGenre: 2,
   );
   var genreMovie2 = GenreMovie(
-    idMovie: 8,
-    idGenre: 2,
+    idMovie: 3,
+    idGenre: 3,
   );
   
   // await dbHelper.insertMovie(movie);
@@ -95,13 +103,17 @@ var producer = Producer(
   //   await dbHelper.insertMovieProducer(movieProducer);
   //     await dbHelper.insertMovieProducer(movieProducer);
   //       await dbHelper.insertMovieProducer(movieProducer);
-  // await dbHelper.insertGenre(genre);
-  // await dbHelper.insertGenreMovie(genreMovie);
-  //   await dbHelper.insertGenre(genre1);
-  // await dbHelper.insertGenreMovie(genreMovie1);
-  //   await dbHelper.insertGenre(genre2);
-  // await dbHelper.insertGenreMovie(genreMovie1);
+  await dbHelper.insertGenre(genre);
+  await dbHelper.insertGenreMovie(genreMovie);
+    await dbHelper.insertGenre(genre1);
+  await dbHelper.insertGenreMovie(genreMovie1);
+    await dbHelper.insertGenre(genre2);
+  await dbHelper.insertGenreMovie(genreMovie2);
 //  await dbHelper.insertActor(actor);
+// await dbHelper.insertMovieActor(movieActor);
+// await dbHelper.insertMovieActor(movieActor);
+// await dbHelper.insertMovieActor(movieActor);
+// await dbHelper.insertMovieActor(movieActor);
 // await dbHelper.insertMovieActor(movieActor);
   var users = await dbHelper.users();
 
