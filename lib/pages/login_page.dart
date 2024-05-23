@@ -14,22 +14,24 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
 
-  void _login() async {
-    if (_formKey.currentState!.validate()) {
-      String username = _usernameController.text;
-      String password = _passwordController.text;
+ void _login() async {
+  if (_formKey.currentState!.validate()) {
+    String username = _usernameController.text;
+    String password = _passwordController.text;
 
-      List<User> users = await _databaseHelper.users();
-      bool userExists = users.any((user) => user.username == username && user.password == password);
+    List<User> users = await _databaseHelper.users();
+    bool userExists = users.any((user) => user.username == username && user.password == password);
 
-      if (userExists) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login successful!')));
-        // Navigate to the home page or another screen
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invalid username or password')));
-      }
+    if (userExists) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login successful!')));
+
+      // Navigate to the home page or another screen after successful login
+      Navigator.pushReplacementNamed(context, '/homepage'); // Replace '/home' with the route name of the desired page
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invalid username or password')));
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {

@@ -37,6 +37,7 @@ dependencies:
 
   sqflite: ^2.0.0+4
   path: ^1.8.0
+  path_provider: any
 
 dev_dependencies:
   flutter_test:
@@ -94,4 +95,6 @@ flutter:
   assets:
     - assets/images/image.png
     - assets/images/first_page.png
+    - assets/images/first_page.jpg
     - assets/images/photo.png
+    - lib/images/movies/inception.png

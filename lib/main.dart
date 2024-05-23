@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import './pages/register_page.dart'; // Import the register page
 import './pages/login_page.dart';
-
+import './insert_data.dart';
+import './pages/homepage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,7 +38,8 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     routes: {
         '/register': (context) => RegisterPage(), // Add route for register page
-        '/login':(context) => LoginPage()
+        '/login':(context) => LoginPage(),
+         '/homepage':(context) => HomePage()
       },
     );
   }
@@ -63,7 +65,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
+ @override
+  void initState() {
+    super.initState();
+    initializeApp(); // Call initializeApp() when the widget is initialized
+  }
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -74,7 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
   }
-
+void initializeApp() async {
+  await insertInitialData();
+}
 @override
 Widget build(BuildContext context) {
   return Scaffold(

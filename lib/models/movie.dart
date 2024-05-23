@@ -25,4 +25,15 @@ class Movie {
       'photo_path': photoPath,
     };
   }
+
+  factory Movie.fromMap(Map<String, dynamic> map) {
+    return Movie(
+      id: map['id'],
+      title: map['title'],
+      year: map['year'],
+      plot: map['plot'],
+      duration: map['duration'],
+      photoPath: map['photo_path'],
+    );
+  }
 }

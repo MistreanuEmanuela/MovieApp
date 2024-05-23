@@ -1,10 +1,10 @@
-class Actor {
+class Producer {
   final int? id;
   final String name;
   final String bio;
   final String photoPath;
 
-  Actor({
+  Producer({
     this.id,
     required this.name,
     required this.bio,
@@ -20,8 +20,8 @@ class Actor {
     };
   }
 
-  factory Actor.fromMap(Map<String, dynamic> map) {
-    return Actor(
+  factory Producer.fromMap(Map<String, dynamic> map) {
+    return Producer(
       id: map['id'],
       name: map['name'],
       bio: map['bio'],

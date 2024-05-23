@@ -2,6 +2,15 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/user.dart';
+import '../models/movie.dart';
+import '../models/actor.dart';
+import '../models/producer.dart';
+import '../models/role.dart';
+import '../models/movie_actor.dart';
+import '../models/movie_producer.dart';
+import '../models/genre.dart';
+import '../models/movie_genre.dart';
+
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -18,17 +27,15 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     return openDatabase(
-      join(await getDatabasesPath(), 'user_database.db'),
+      join(await getDatabasesPath(), 'movie_app.db'),
       onCreate: (db, version) async {
         await _createTables(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        // Drop existing tables if they exist
         await _dropTables(db);
-        // Recreate tables with updated schema
         await _createTables(db);
       },
-      version: 2, // Increment the version number if needed
+      version: 2,
     );
   }
 
@@ -101,6 +108,78 @@ class DatabaseHelper {
     );
   }
 
+  Future<void> insertMovie(Movie movie) async {
+    final db = await database;
+    await db.insert(
+      'movies',
+      movie.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> insertActor(Actor actor) async {
+    final db = await database;
+    await db.insert(
+      'actors',
+      actor.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> insertProducer(Producer producer) async {
+    final db = await database;
+    await db.insert(
+      'producers',
+      producer.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> insertRole(Role role) async {
+    final db = await database;
+    await db.insert(
+      'roles',
+      role.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> insertMovieActor(MovieActor movieActor) async {
+    final db = await database;
+    await db.insert(
+      'movie_actor',
+      movieActor.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> insertMovieProducer(MovieProducer movieProducer) async {
+    final db = await database;
+    await db.insert(
+      'movie_producer',
+      movieProducer.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> insertGenre(Genre genre) async {
+    final db = await database;
+    await db.insert(
+      'genres',
+      genre.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> insertGenreMovie(GenreMovie genreMovie) async {
+    final db = await database;
+    await db.insert(
+      'genre_movies',
+      genreMovie.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
   Future<List<User>> users() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('users');
@@ -108,4 +187,54 @@ class DatabaseHelper {
       return User.fromMap(maps[i]);
     });
   }
+
+  Future<List<Movie>> movies() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('movies');
+    return List.generate(maps.length, (i) {
+      return Movie.fromMap(maps[i]);
+    });
+  }
+Future<List<Movie>> moviesByYearDesc() async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.query(
+    'movies',
+    orderBy: 'year DESC',
+  );
+  return List.generate(maps.length, (i) {
+    return Movie.fromMap(maps[i]);
+  });
+}
+Future<void> deleteMovie(int id) async {
+    final db = await database;
+    await db.delete(
+      'movies',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> deleteAllMovies() async {
+    final db = await database;
+    await db.delete('movies');
+  }
+
+
+  Future<List<Genre>> getGenresForMovie(int movieId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'genres',
+      columns: ['id', 'name'],
+      where: 'id IN (SELECT id_genre FROM genre_movies WHERE id_movie = ?)',
+      whereArgs: [movieId ?? 0], // Handle nullable movieId
+    );
+
+    return List.generate(maps.length, (i) {
+      return Genre(
+        id: maps[i]['id'],
+        name: maps[i]['name'],
+      );
+    });
+  }
+  
 }
