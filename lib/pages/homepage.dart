@@ -30,13 +30,19 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<List<Movie>> _fetchMovies() async {
-    if (_selectedGenre == 'All') {
-      return await _databaseHelper.movies();
-    } else {
-      return await _databaseHelper.getMoviesByGenre(_selectedGenre);
-    }
+ Future<List<Movie>> _fetchMovies() async {
+  List<Movie> movies;
+  if (_selectedGenre == 'All') {
+    movies = await _databaseHelper.movies();
+  } else {
+    movies = await _databaseHelper.getMoviesByGenre(_selectedGenre);
   }
+  
+  // Filter out duplicates
+  movies = movies.toSet().toList(); // Convert to Set to remove duplicates, then back to List
+  
+  return movies;
+}
 
   Widget _buildGenreButtons() {
     List<Widget> buttons = [];

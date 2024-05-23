@@ -6,6 +6,7 @@ import '../helpers/database_helper.dart';
 import '../models/actor.dart';
 import '../models/role.dart';
 import '../user_preferinces.dart';
+import '../pages/actor_page.dart';
 
 class MoviePage extends StatefulWidget {
   final int movieId;
@@ -211,53 +212,63 @@ class _MoviePageState extends State<MoviePage> {
   }
 Widget _buildActors(List<Actor> actors) {
   return Container(
-    height: 200, // Adjust the height according to your needs
-    child: SingleChildScrollView( // Wrap in a SingleChildScrollView to avoid overflow
+    height: 200,
+    child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: actors.map((actor) {
           return SizedBox(
-            width: 160, // Adjust the width according to your needs
-            child: Container(
-              margin: EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 8.0),
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundImage: AssetImage(actor.photoPath),
+            width: 160,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ActorPage(actorId: actor.id!),
+                  ),
+                );
+              },
+              child: Container(
+                margin: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 8.0),
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundImage: AssetImage(actor.photoPath),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(
-                    actor.name,
-                    style: TextStyle(fontSize: 14.0, color: Colors.black),
-                  ),
-                  SizedBox(height: 5.0),
-                  FutureBuilder<Role>(
-                    future: DatabaseHelper().getRoleForMovieActor(widget.movieId!, actor.id!), // Corrected 'movieId'
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (!snapshot.hasData) {
-                        return Text('Role not found');
-                      } else {
-                        return Text(
-                          snapshot.data!.name,
-                          style: TextStyle(fontSize: 12.0),
-                        );
-                      }
-                    },
-                  ),
-                ],
+                    SizedBox(height: 8.0),
+                    Text(
+                      actor.name,
+                      style: TextStyle(fontSize: 14.0, color: Colors.black),
+                    ),
+                    SizedBox(height: 5.0),
+                    FutureBuilder<Role>(
+                      future: DatabaseHelper().getRoleForMovieActor(widget.movieId, actor.id!),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else if (!snapshot.hasData) {
+                          return Text('Role not found');
+                        } else {
+                          return Text(
+                            snapshot.data!.name,
+                            style: TextStyle(fontSize: 12.0),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           );

@@ -256,7 +256,14 @@ Future<void> deleteMovie(int id) async {
       whereArgs: [id],
     );
   }
-
+Future<void> deleteGenre(int id) async {
+    final db = await database;
+    await db.delete(
+      'genres',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
   Future<void> deleteAllMovies() async {
     final db = await database;
     await db.delete('movies');
@@ -387,6 +394,7 @@ Future<List<Genre>> getAllGenres() async {
     );
   }
 
+
   Future<void> insertFavoriteActor(int actorId, int userId) async {
     final db = await database;
     await db.insert(
@@ -470,5 +478,42 @@ Future<bool> checkPreferences(int userId, int movieId) async {
 
   return result.isNotEmpty;
 }
+Future<Actor> getActorById(int actorId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'actors',
+      where: 'id = ?',
+      whereArgs: [actorId],
+    );
 
+    if (maps.isNotEmpty) {
+      return Actor.fromMap(maps.first);
+    } else {
+      throw Exception('Actor with id $actorId not found');
+    }
+  }
+
+  Future<List<Movie>> getMoviesForActor(int actorId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      'SELECT movies.* FROM movies '
+      'INNER JOIN movie_actor ON movies.id = movie_actor.id_movie '
+      'WHERE movie_actor.id_actor = ?',
+      [actorId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return Movie.fromMap(maps[i]);
+    });
+  }
+Future<bool> checkPreferencesActor(int userId, int actorId) async {
+  final db = await database;
+  final List<Map<String, dynamic>> result = await db.query(
+    'favorite_actors',
+    where: 'id_user = ? AND id_actor = ?',
+    whereArgs: [userId, actorId],
+  );
+
+  return result.isNotEmpty;
+}
 }
