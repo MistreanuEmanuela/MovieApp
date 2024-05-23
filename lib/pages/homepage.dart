@@ -4,6 +4,7 @@ import '../models/genre.dart';
 import '../models/movie.dart';
 import 'movie_page.dart';  // Import the new page
 import '../pages/favorite_movies.dart';
+import '../pages/favorite_actors.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -138,9 +139,13 @@ class _HomePageState extends State<HomePage> {
           ),
         );
                 break;
-              case 'About':
-                // Navigate to About page
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => AboutPage()));
+              case 'Favorite Actors':
+                 Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FavoriteActorsPage(),
+          ),
+                 );
                 break;
               // Add more cases for additional menu items
             }
@@ -151,8 +156,8 @@ class _HomePageState extends State<HomePage> {
               child: Text('Favorite Movies'),
             ),
             PopupMenuItem<String>(
-              value: 'About',
-              child: Text('About'),
+              value: 'Favorite Actors',
+              child: Text('Favorite Actors'),
             ),
             // Add more PopupMenuItems for additional menu options
           ],
