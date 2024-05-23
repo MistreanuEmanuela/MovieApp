@@ -19,21 +19,66 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     return openDatabase(
       join(await getDatabasesPath(), 'user_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE users(id INTEGER PRIMARY KEY, firstname TEXT, lastname TEXT, username TEXT, email TEXT, password TEXT)",
-        );
+      onCreate: (db, version) async {
+        await _createTables(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        // Drop existing table if it exists
-        await db.execute('DROP TABLE IF EXISTS users');
-        // Recreate table with updated schema
-        await db.execute(
-          "CREATE TABLE users(id INTEGER PRIMARY KEY, firstname TEXT, lastname TEXT, username TEXT, email TEXT, password TEXT)",
-        );
+        // Drop existing tables if they exist
+        await _dropTables(db);
+        // Recreate tables with updated schema
+        await _createTables(db);
       },
-      version: 2, // Increment the version number
+      version: 2, // Increment the version number if needed
     );
+  }
+
+  Future<void> _createTables(Database db) async {
+    await db.execute(
+      "CREATE TABLE users(id INTEGER PRIMARY KEY, firstname TEXT, lastname TEXT, username TEXT, email TEXT, password TEXT)",
+    );
+    await db.execute(
+      "CREATE TABLE movies(id INTEGER PRIMARY KEY, title TEXT, year INTEGER, plot TEXT, duration TEXT, photo_path TEXT)",
+    );
+    await db.execute(
+      "CREATE TABLE actors(id INTEGER PRIMARY KEY, name TEXT, bio TEXT, photo_path TEXT)",
+    );
+    await db.execute(
+      "CREATE TABLE producers(id INTEGER PRIMARY KEY, name TEXT, bio TEXT, photo_path TEXT)",
+    );
+    await db.execute(
+      "CREATE TABLE roles(id INTEGER PRIMARY KEY, name TEXT)",
+    );
+    await db.execute(
+      "CREATE TABLE movie_actor(id INTEGER PRIMARY KEY, id_movie INTEGER, id_actor INTEGER, id_role INTEGER, "
+      "FOREIGN KEY(id_movie) REFERENCES movies(id), "
+      "FOREIGN KEY(id_actor) REFERENCES actors(id), "
+      "FOREIGN KEY(id_role) REFERENCES roles(id))",
+    );
+    await db.execute(
+      "CREATE TABLE movie_producer(id INTEGER PRIMARY KEY, id_movie INTEGER, id_producer INTEGER, "
+      "FOREIGN KEY(id_movie) REFERENCES movies(id), "
+      "FOREIGN KEY(id_producer) REFERENCES producers(id))",
+    );
+    await db.execute(
+      "CREATE TABLE genres(id INTEGER PRIMARY KEY, name TEXT)",
+    );
+    await db.execute(
+      "CREATE TABLE genre_movies(id INTEGER PRIMARY KEY, id_movie INTEGER, id_genre INTEGER, "
+      "FOREIGN KEY(id_movie) REFERENCES movies(id), "
+      "FOREIGN KEY(id_genre) REFERENCES genres(id))",
+    );
+  }
+
+  Future<void> _dropTables(Database db) async {
+    await db.execute('DROP TABLE IF EXISTS users');
+    await db.execute('DROP TABLE IF EXISTS movies');
+    await db.execute('DROP TABLE IF EXISTS actors');
+    await db.execute('DROP TABLE IF EXISTS producers');
+    await db.execute('DROP TABLE IF EXISTS roles');
+    await db.execute('DROP TABLE IF EXISTS movie_actor');
+    await db.execute('DROP TABLE IF EXISTS movie_producer');
+    await db.execute('DROP TABLE IF EXISTS genres');
+    await db.execute('DROP TABLE IF EXISTS genre_movies');
   }
 
   // Future<List<String>> getAllTableNames() async {
@@ -64,4 +109,3 @@ class DatabaseHelper {
     });
   }
 }
-
