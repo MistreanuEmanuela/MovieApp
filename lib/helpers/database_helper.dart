@@ -524,4 +524,20 @@ Future<bool> checkPreferencesActor(int userId, int actorId) async {
 
   return result.isNotEmpty;
 }
+
+   Future<List<Movie>> getTopMovies() async {
+  final db = await database;
+
+  final List<Map<String, dynamic>> maps = await db.rawQuery(
+    '''
+    SELECT movies.* FROM movies 
+    LIMIT 3
+    ''',
+  );
+
+  return List.generate(maps.length, (i) {
+    return Movie.fromMap(maps[i]);
+  });
+}
+
 }

@@ -5,6 +5,7 @@ import '../models/movie.dart';
 import 'movie_page.dart';  // Import the new page
 import '../pages/favorite_movies.dart';
 import '../pages/favorite_actors.dart';
+import 'dart:ui';
 
 class HomePage extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   late List<Genre> _genres = [];
   late Future<List<Movie>> _moviesFuture;
   late DatabaseHelper _databaseHelper;
+  late Future<List<Movie>> _movieFavFuture;
   String _selectedGenre = 'All';
 
   @override
@@ -23,6 +25,7 @@ class _HomePageState extends State<HomePage> {
     _databaseHelper = DatabaseHelper();
     _fetchGenres();
     _moviesFuture = _fetchMovies();
+    _movieFavFuture = _databaseHelper.getTopMovies();
   }
 
   Future<void> _fetchGenres() async {
@@ -89,81 +92,77 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildMovieList() {
-    return FutureBuilder<List<Movie>>(
-      future: _moviesFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
-        } else {
-          final movies = snapshot.data!;
-          return ListView.builder(
-            itemCount: (movies.length / 2).ceil(),
-            itemBuilder: (context, index) {
-              final startIndex = index * 2;
-              final endIndex = (index * 2) + 2;
-              return Row(
-                children: [
-                  for (var i = startIndex; i < endIndex && i < movies.length; i++)
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MovieItem(movie: movies[i]),
-                      ),
-                    ),
-                ],
-              );
-            },
-          );
-        }
-      },
-    );
-  }
+Widget _buildMovieList() {
+  return FutureBuilder<List<Movie>>(
+    future: _moviesFuture,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+      } else {
+        final movies = snapshot.data!;
+        return ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+            for (int i = 0; i < movies.length; i += 2)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    MovieItem(movie: movies[i]),
+                    SizedBox(width: 8.0), // Adjust spacing between movies if needed
+                    if (i + 1 < movies.length) MovieItem(movie: movies[i + 1]),
+                  ],
+                ),
+              ),
+          ],
+        );
+      }
+    },
+  );
+
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      title: Text('Movie App'),
-      actions: [
-        PopupMenuButton<String>(
-          onSelected: (value) {
-            switch (value) {
-              case 'Favorite Movies':
-               Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FavoriteMoviesPage(),
-          ),
-        );
-                break;
-              case 'Favorite Actors':
-                 Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FavoriteActorsPage(),
-          ),
-                 );
-                break;
-              // Add more cases for additional menu items
-            }
+        backgroundColor:  const Color.fromARGB(255, 2, 28, 70),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Colors.white, // Set icon color to white
+          onPressed: () {
+            // Add onPressed functionality here
           },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            PopupMenuItem<String>(
-              value: 'Favorite Movies',
-              child: Text('Favorite Movies'),
-            ),
-            PopupMenuItem<String>(
-              value: 'Favorite Actors',
-              child: Text('Favorite Actors'),
-            ),
-            // Add more PopupMenuItems for additional menu options
-          ],
         ),
-      ],
-    ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.movie),
+            color: Colors.white, // Set icon color to white
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoriteMoviesPage(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.person_3_rounded),
+            color: Colors.white, // Set icon color to white
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoriteActorsPage(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -177,10 +176,12 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Choose a Genre:',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white), // Adjust color as needed
-                ),
+                SizedBox(height: 16.0),
+                 Text(
+                        'Top Movies',
+                        style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                _buildTopMoviesSection(),
                 SizedBox(height: 16.0),
                 _buildGenreButtons(),
                 SizedBox(height: 16.0),
@@ -192,6 +193,87 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+_buildTopMoviesSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      SizedBox(
+        height: 260.0, // Height of the favorite movie item
+        child: FutureBuilder<List<Movie>>(
+          future: _movieFavFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+            } else {
+              final movies = snapshot.data!;
+              if (movies.isNotEmpty) {
+                return PageView.builder(
+                  itemCount: movies.length,
+                  physics: BouncingScrollPhysics(), // Custom physics for partial visibility
+                  itemBuilder: (context, index) {
+                    final movie = movies[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MoviePage(movieId: movie.id!),
+                          ),
+                        );
+                      },
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 6.0),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Previous Movie
+                              // Current Movie
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Image.asset(
+                                  movie.photoPath,
+                                  fit: BoxFit.cover,
+                                  width: MediaQuery.of(context).size.width * 0.85, // Adjusted width for center visibility
+                                  height: 230.0, // Height of the image
+                                ),
+                              ),
+                              // Next Movie
+                              // Current Movie Title
+                              Positioned(
+                                bottom: 10.0,
+                                left: 10.0,
+                                child: Text(
+                                  movie.title,
+                                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              } else {
+                return Center(
+                  child: Text(
+                    'No favorite movies yet.',
+                    style: TextStyle(fontSize: 16.0, color: Colors.white),
+                  ),
+                );
+              }
+            }
+          },
+        ),
+      ),
+      SizedBox(height: 16.0),
+    ],
+  );
+}
 }
 
 void main() {
@@ -235,8 +317,8 @@ class MovieItem extends StatelessWidget {
                   child: Image.asset(
                     movie.photoPath,
                     fit: BoxFit.cover,
-                    width: MediaQuery.of(context).size.width * 0.8, // Adjust the width here for grid layout
-                    height: 200,
+                    width: 160.0, // Fixed width for each movie item
+                    height: 220.0,
                   ),
                 ),
               ),
@@ -261,23 +343,26 @@ class MovieItem extends StatelessWidget {
                   ),
                   SizedBox(height: 5.0),
                   FutureBuilder<List<Genre>>(
-                    future: DatabaseHelper().getGenresForMovie(movie.id ?? 0),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        final genres = snapshot.data!;
-                        final genreNames = genres.map((genre) => genre.name).toList();
-                        final genreString = genreNames.join(', '); // Join genre names with commas
-                        return Text(
-                          '$genreString',
-                          style: TextStyle(fontSize: 14.0),
-                        );
-                      }
-                    },
-                  ),
+  future: DatabaseHelper().getGenresForMovie(movie.id ?? 0),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    } else if (snapshot.hasError) {
+      return Text('Error: ${snapshot.error}');
+    } else {
+      final genres = snapshot.data!;
+      final genreNames = genres.map((genre) => genre.name).toList();
+      final genreString = genreNames.join(', '); // Join genre names with commas
+      return SizedBox(
+        width: 160.0, // Maximum width for genre text
+        child: Text(
+          '$genreString',
+          style: TextStyle(fontSize: 14.0),
+        ),
+      );
+    }
+  },
+),
                 ],
               ),
             ),
