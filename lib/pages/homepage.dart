@@ -5,7 +5,7 @@ import '../models/movie.dart';
 import 'movie_page.dart';  // Import the new page
 import '../pages/favorite_movies.dart';
 import '../pages/favorite_actors.dart';
-import 'dart:ui';
+import '../pages/search_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -137,6 +137,18 @@ Widget _buildMovieList() {
           },
         ),
         actions: [
+            IconButton(
+            icon: Icon(Icons.search),
+            color: Colors.white, // Set icon color to white
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SearchPage (),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(Icons.movie),
             color: Colors.white, // Set icon color to white

@@ -540,4 +540,16 @@ Future<bool> checkPreferencesActor(int userId, int actorId) async {
   });
 }
 
+Future<List<Movie>> searchMovies(String query) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'movies',
+      where: 'title LIKE ?',
+      whereArgs: ['%$query%'],
+    );
+    return List.generate(maps.length, (i) {
+      return Movie.fromMap(maps[i]);
+    });
+  }
+
 }
