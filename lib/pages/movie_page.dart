@@ -7,7 +7,6 @@ import '../models/actor.dart';
 import '../models/role.dart';
 import '../user_preferinces.dart';
 import '../pages/actor_page.dart';
-
 class MoviePage extends StatefulWidget {
   final int movieId;
 
@@ -19,17 +18,27 @@ class MoviePage extends StatefulWidget {
 
 
 class _MoviePageState extends State<MoviePage> {
-  late int userId;
+  late int userId ;
+  late bool isFavorite =false;
 
   @override
-  void initState() {
-    super.initState();
-    UserPreferences.getUserId().then((value) {
-      setState(() {
-        userId = value!;
+ void initState() {
+  super.initState();
+  
+  // Retrieve userId first
+  UserPreferences.getUserId().then((value) {
+    setState(() {
+      userId = value!;
+      
+      // Once userId is retrieved, then proceed to check preferences
+      DatabaseHelper().checkPreferences(userId, widget.movieId).then((isFav) {
+        setState(() {
+          isFavorite = isFav;
+        });
       });
     });
-  }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +73,8 @@ class _MoviePageState extends State<MoviePage> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+                    return Center(
+                        child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
                   } else if (!snapshot.hasData) {
                     return Center(child: Text('Movie not found', style: TextStyle(color: Colors.white)));
                   } else {
@@ -75,13 +85,61 @@ class _MoviePageState extends State<MoviePage> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: double.infinity,
-                          child: Image.asset(
-                            movie.photoPath,
-                            fit: BoxFit.cover,
-                            height: 300,
-                          ),
+                        Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              child: GestureDetector(
+                                onTap: () {
+                                  // Navigator.push(
+                                  //   // context,
+                                  //   // MaterialPageRoute(
+                                  //   //   builder: (context) => MovieImagePage(movieId: movie.id),
+                                  //   // ),
+                                  // );
+                                },
+                                child: Image.asset(
+                                  movie.photoPath,
+                                  fit: BoxFit.cover,
+                                  height: 300,
+                                ),
+                              ),
+                            ),
+                            isFavorite
+                                ? IconButton(
+                                      icon: Icon(
+                                      Icons.favorite,
+                                      color: const Color.fromARGB(255, 255, 0, 0),
+                                      size: 40,
+                                    ),
+                                    onPressed: () async {
+                                      await DatabaseHelper().deleteFavoriteMovie(widget.movieId, userId);
+                                      setState(() {
+                                        isFavorite = false;
+                                      });
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Movie deleted')),
+                                      );
+                                    },
+                                  )
+                                : IconButton(
+                                     icon: Icon(
+                                      Icons.favorite_border_outlined,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                    onPressed: () async {
+                                      await DatabaseHelper().insertFavoriteMovie(widget.movieId, userId);
+                                      setState(() {
+                                        isFavorite = true;
+                                      });
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Movie favorited')),
+                                      );
+                                    },
+                                  ),
+                          ],
                         ),
                         SizedBox(height: 16.0),
                         Row(
@@ -142,35 +200,6 @@ class _MoviePageState extends State<MoviePage> {
                         SizedBox(height: 16.0),
                         _buildActors(actors),
                         SizedBox(height: 16.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () async {
-                                if (await DatabaseHelper().checkPreferences(userId, widget.movieId)) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Movie already favorited')),
-                                  );
-                                } else {
-                                  await DatabaseHelper().insertFavoriteMovie(widget.movieId, userId);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Movie favorited')),
-                                  );
-                                }
-                              },
-                              child: Text('Favorite'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                await DatabaseHelper().deleteFavoriteMovie(widget.movieId, userId);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Movie deleted')),
-                                );
-                              },
-                              child: Text('Delete'),
-                            ),
-                          ],
-                        ),
                       ],
                     );
                   }
@@ -184,35 +213,120 @@ class _MoviePageState extends State<MoviePage> {
   }
 
   Widget _buildProducers(List<Producer> producers) {
-    return Container(
-      height: 150, // Adjust the height according to your needs
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: producers.length,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage(producers[index].photoPath),
+    return Stack(
+      children: [
+        Container(
+          height: 150, // Adjust the height according to your needs
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: producers.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  _showProducerInfoDialog(context, producers[index]);
+                },
+                child: Container(
+                  margin: EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundImage: AssetImage(producers[index].photoPath),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        producers[index].name,
+                        style: TextStyle(fontSize: 14.0, color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
-                SizedBox(height: 8.0),
-                Text(
-                  producers[index].name,
-                  style: TextStyle(fontSize: 14.0, color: Colors.white),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        ),
+        // Overlay to dim the background
+        Container(
+          color: Colors.black.withOpacity(0.2), // Adjust opacity as needed
+        ),
+      ],
     );
   }
+void _showProducerInfoDialog(BuildContext context, Producer producer) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        contentPadding: EdgeInsets.zero,
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          padding: EdgeInsets.only(top: 8.0, right: 8.0), // Add padding
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: Stack(
+            alignment: Alignment.topRight, // Align Stack to top right
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 0, 0),
+                    child: CircleAvatar(
+                      radius: 60,
+                      backgroundImage: AssetImage(producer.photoPath),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    producer.name,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    child: Center( // Centering the text horizontally and vertically
+                      child: Text(
+                        '${producer.bio}',
+                        textAlign: TextAlign.center, // Align text to center
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 Widget _buildActors(List<Actor> actors) {
   return Container(
-    height: 200,
+    height: 170,
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(

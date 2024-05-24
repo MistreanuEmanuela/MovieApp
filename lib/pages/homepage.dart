@@ -6,6 +6,7 @@ import 'movie_page.dart';  // Import the new page
 import '../pages/favorite_movies.dart';
 import '../pages/favorite_actors.dart';
 import '../pages/search_page.dart';
+import '../user_preferinces.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -18,14 +19,36 @@ class _HomePageState extends State<HomePage> {
   late DatabaseHelper _databaseHelper;
   late Future<List<Movie>> _movieFavFuture;
   String _selectedGenre = 'All';
+  late int userId;
 
   @override
   void initState() {
     super.initState();
+    UserPreferences.getUserId().then((value) {
+      setState(() {
+        userId = value!;
+      });
+    });
     _databaseHelper = DatabaseHelper();
     _fetchGenres();
     _moviesFuture = _fetchMovies();
     _movieFavFuture = _databaseHelper.getTopMovies();
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      ModalRoute.of(context)?.addScopedWillPopCallback(handleWillPop);
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    ModalRoute.of(context)?.removeScopedWillPopCallback(handleWillPop);
+  }
+
+  Future<bool> handleWillPop() async {
+    Navigator.popUntil(context, (route) {
+      return route.isFirst;
+    });
+    return true;
   }
 
   Future<void> _fetchGenres() async {
@@ -35,19 +58,19 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
- Future<List<Movie>> _fetchMovies() async {
-  List<Movie> movies;
-  if (_selectedGenre == 'All') {
-    movies = await _databaseHelper.movies();
-  } else {
-    movies = await _databaseHelper.getMoviesByGenre(_selectedGenre);
+  Future<List<Movie>> _fetchMovies() async {
+    List<Movie> movies;
+    if (_selectedGenre == 'All') {
+      movies = await _databaseHelper.movies();
+    } else {
+      movies = await _databaseHelper.getMoviesByGenre(_selectedGenre);
+    }
+    
+    // Filter out duplicates
+    movies = movies.toSet().toList(); // Convert to Set to remove duplicates, then back to List
+    
+    return movies;
   }
-  
-  // Filter out duplicates
-  movies = movies.toSet().toList(); // Convert to Set to remove duplicates, then back to List
-  
-  return movies;
-}
 
   Widget _buildGenreButtons() {
     List<Widget> buttons = [];
@@ -92,37 +115,36 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-Widget _buildMovieList() {
-  return FutureBuilder<List<Movie>>(
-    future: _moviesFuture,
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(child: CircularProgressIndicator());
-      } else if (snapshot.hasError) {
-        return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
-      } else {
-        final movies = snapshot.data!;
-        return ListView(
-          scrollDirection: Axis.horizontal,
-          children: [
-            for (int i = 0; i < movies.length; i += 2)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  children: [
-                    MovieItem(movie: movies[i]),
-                    SizedBox(width: 8.0), // Adjust spacing between movies if needed
-                    if (i + 1 < movies.length) MovieItem(movie: movies[i + 1]),
-                  ],
+  Widget _buildMovieList() {
+    return FutureBuilder<List<Movie>>(
+      future: _moviesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+        } else {
+          final movies = snapshot.data!;
+          return ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              for (int i = 0; i < movies.length; i += 2)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: [
+                      MovieItem(movie: movies[i], userId: userId),
+                      SizedBox(width: 8.0), // Adjust spacing between movies if needed
+                      if (i + 1 < movies.length) MovieItem(movie: movies[i + 1], userId: userId,),
+                    ],
+                  ),
                 ),
-              ),
-          ],
-        );
-      }
-    },
-  );
-
-}
+            ],
+          );
+        }
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,15 +155,15 @@ Widget _buildMovieList() {
           icon: Icon(Icons.arrow_back),
           color: Colors.white, // Set icon color to white
           onPressed: () {
-            // Add onPressed functionality here
+            // No action needed here
           },
         ),
         actions: [
-            IconButton(
+          IconButton(
             icon: Icon(Icons.search),
             color: Colors.white, // Set icon color to white
             onPressed: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => SearchPage (),
@@ -153,7 +175,7 @@ Widget _buildMovieList() {
             icon: Icon(Icons.movie),
             color: Colors.white, // Set icon color to white
             onPressed: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => FavoriteMoviesPage(),
@@ -165,7 +187,7 @@ Widget _buildMovieList() {
             icon: Icon(Icons.person_3_rounded),
             color: Colors.white, // Set icon color to white
             onPressed: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => FavoriteActorsPage(),
@@ -189,10 +211,10 @@ Widget _buildMovieList() {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(height: 16.0),
-                 Text(
-                        'Top Movies',
-                        style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
+                Text(
+                  'Top Movies',
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
                 _buildTopMoviesSection(),
                 SizedBox(height: 16.0),
                 _buildGenreButtons(),
@@ -206,86 +228,118 @@ Widget _buildMovieList() {
     );
   }
 
-_buildTopMoviesSection() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      SizedBox(
-        height: 260.0, // Height of the favorite movie item
-        child: FutureBuilder<List<Movie>>(
-          future: _movieFavFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
-            } else {
-              final movies = snapshot.data!;
-              if (movies.isNotEmpty) {
-                return PageView.builder(
-                  itemCount: movies.length,
-                  physics: BouncingScrollPhysics(), // Custom physics for partial visibility
-                  itemBuilder: (context, index) {
-                    final movie = movies[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MoviePage(movieId: movie.id!),
-                          ),
-                        );
-                      },
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 6.0),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Previous Movie
-                              // Current Movie
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: Image.asset(
-                                  movie.photoPath,
-                                  fit: BoxFit.cover,
-                                  width: MediaQuery.of(context).size.width * 0.85, // Adjusted width for center visibility
-                                  height: 230.0, // Height of the image
+  Widget _buildTopMoviesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          height: 260.0, // Height of the favorite movie item
+          child: FutureBuilder<List<Movie>>(
+            future: _movieFavFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+              } else {
+                final movies = snapshot.data!;
+                if (movies.isNotEmpty) {
+                  return PageView.builder(
+                    itemCount: movies.length,
+                    physics: BouncingScrollPhysics(), // Custom physics for partial visibility
+                    itemBuilder: (context, index) {
+                      final movie = movies[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MoviePage(movieId: movie.id!),
+                            ),
+                          );
+                        },
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 6.0),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Image
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  child: Image.asset(
+                                    movie.photoPath,
+                                    fit: BoxFit.cover,
+                                    width: MediaQuery.of(context).size.width * 0.85, // Adjusted width for center visibility
+                                    height: 230.0, // Height of the image
+                                  ),
                                 ),
-                              ),
-                              // Next Movie
-                              // Current Movie Title
-                              Positioned(
-                                bottom: 10.0,
-                                left: 10.0,
-                                child: Text(
-                                  movie.title,
-                                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
+                                // Title
+                                Positioned(
+                                  bottom: 10.0,
+                                  left: 10.0,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        movie.title,
+                                        style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.white), // Bigger title
+                                      ),
+                                      FutureBuilder<List<Genre>>(
+                                        future: _databaseHelper.getGenresForMovie(movie.id!),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                            return SizedBox(); // Return an empty container while waiting for data
+                                          } else if (snapshot.hasError) {
+                                            return SizedBox(); // Return an empty container if there's an error
+                                          } else {
+                                            final genres = snapshot.data!;
+                                            return Wrap(
+                                              spacing: 4.0, // Adjust spacing between boxes
+                                              runSpacing: 3.0, // Adjust spacing between rows
+                                              children: genres.map((genre) {
+                                                return Container(
+                                                  padding: EdgeInsets.all(4.0),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.withOpacity(0.7),
+                                                    borderRadius: BorderRadius.circular(4.0),
+                                                  ),
+                                                  child: Text(
+                                                    genre.name,
+                                                    style: TextStyle(fontSize: 12.0, color: Colors.white),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              } else {
-                return Center(
-                  child: Text(
-                    'No favorite movies yet.',
-                    style: TextStyle(fontSize: 16.0, color: Colors.white),
-                  ),
-                );
+                      );
+                    },
+                  );
+                } else {
+                  return Center(
+                    child: Text(
+                      'No favorite movies yet.',
+                      style: TextStyle(fontSize: 16.0, color: Colors.white),
+                    ),
+                  );
+                }
               }
-            }
-          },
+            },
+          ),
         ),
-      ),
-      SizedBox(height: 16.0),
-    ],
-  );
-}
+        SizedBox(height: 16.0),
+      ],
+    );
+  }
 }
 
 void main() {
@@ -294,10 +348,31 @@ void main() {
   ));
 }
 
-class MovieItem extends StatelessWidget {
+class MovieItem extends StatefulWidget {
   final Movie movie;
+  final int userId; // Add userId as a parameter
 
-  const MovieItem({Key? key, required this.movie}) : super(key: key);
+  const MovieItem({Key? key, required this.movie, required this.userId}) : super(key: key);
+
+  @override
+  _MovieItemState createState() => _MovieItemState();
+}
+
+class _MovieItemState extends State<MovieItem> {
+  late bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfFavorite();
+  }
+
+  Future<void> checkIfFavorite() async {
+    bool favorite = await DatabaseHelper().checkPreferences(widget.userId, widget.movie.id!);
+    setState(() {
+      isFavorite = favorite;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -306,7 +381,7 @@ class MovieItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => MoviePage(movieId: movie.id!),
+            builder: (context) => MoviePage(movieId: widget.movie.id!),
           ),
         );
       },
@@ -316,69 +391,83 @@ class MovieItem extends StatelessWidget {
           color: Colors.white.withOpacity(0.7), // Adjust the opacity here
           borderRadius: BorderRadius.circular(10.0),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Container(
-              margin: EdgeInsets.only(top: 10.0),
-              alignment: Alignment.center,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Image.asset(
-                    movie.photoPath,
-                    fit: BoxFit.cover,
-                    width: 160.0, // Fixed width for each movie item
-                    height: 220.0,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 10.0),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    movie.title,
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 10.0),
+                  alignment: Alignment.center,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Image.asset(
+                        widget.movie.photoPath,
+                        fit: BoxFit.cover,
+                        width: 160.0, // Fixed width for each movie item
+                        height: 220.0,
+                      ),
                     ),
                   ),
-                  SizedBox(height: 5.0),
-                  Text(
-                    '${movie.year} | ${movie.duration}',
-                    style: TextStyle(fontSize: 14.0),
+                ),
+                SizedBox(height: 10.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.movie.title,
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 5.0),
+                      Text(
+                        '${widget.movie.year} | ${widget.movie.duration}',
+                        style: TextStyle(fontSize: 14.0),
+                      ),
+                      SizedBox(height: 5.0),
+                      FutureBuilder<List<Genre>>(
+                        future: DatabaseHelper().getGenresForMovie(widget.movie.id ?? 0),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            final genres = snapshot.data!;
+                            final genreNames = genres.map((genre) => genre.name).toList();
+                            final genreString = genreNames.join(', '); // Join genre names with commas
+                            return SizedBox(
+                              width: 160.0, // Maximum width for genre text
+                              child: Text(
+                                '$genreString',
+                                style: TextStyle(fontSize: 14.0),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 5.0),
-                  FutureBuilder<List<Genre>>(
-  future: DatabaseHelper().getGenresForMovie(movie.id ?? 0),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return CircularProgressIndicator();
-    } else if (snapshot.hasError) {
-      return Text('Error: ${snapshot.error}');
-    } else {
-      final genres = snapshot.data!;
-      final genreNames = genres.map((genre) => genre.name).toList();
-      final genreString = genreNames.join(', '); // Join genre names with commas
-      return SizedBox(
-        width: 160.0, // Maximum width for genre text
-        child: Text(
-          '$genreString',
-          style: TextStyle(fontSize: 14.0),
-        ),
-      );
-    }
-  },
-),
-                ],
-              ),
+                ),
+                SizedBox(height: 10.0),
+              ],
             ),
-            SizedBox(height: 10.0),
+            if (isFavorite ?? false) // Ensure isFavorite is not null before accessing its value
+            Positioned(
+                top: 10,
+                right: 20,
+                child: Icon(
+                  Icons.favorite,
+                  color: Colors.red,
+                  size: 32, // Adjust the size here, for example
+                ),
+              ),
           ],
         ),
       ),
