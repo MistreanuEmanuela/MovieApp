@@ -41,12 +41,13 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 2, 28, 70),
-        leading: IconButton(
+     leading: IconButton(
           icon: Icon(Icons.arrow_back),
           color: Colors.white, // Set icon color to white
           onPressed: () {
-            // Add onPressed functionality here
+            Navigator.pop(context); // Navigate back to the previous screen
           },
+    
         ),
         actions: [
           IconButton(

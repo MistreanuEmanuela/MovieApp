@@ -33,23 +33,12 @@ class _HomePageState extends State<HomePage> {
     _fetchGenres();
     _moviesFuture = _fetchMovies();
     _movieFavFuture = _databaseHelper.getTopMovies();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      ModalRoute.of(context)?.addScopedWillPopCallback(handleWillPop);
-    });
+
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    ModalRoute.of(context)?.removeScopedWillPopCallback(handleWillPop);
-  }
+ 
 
-  Future<bool> handleWillPop() async {
-    Navigator.popUntil(context, (route) {
-      return route.isFirst;
-    });
-    return true;
-  }
+
 
   Future<void> _fetchGenres() async {
     final genres = await _databaseHelper.getAllGenres();
@@ -155,7 +144,7 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.arrow_back),
           color: Colors.white, // Set icon color to white
           onPressed: () {
-            // No action needed here
+            Navigator.pop(context); // Navigate back to the previous screen
           },
         ),
         actions: [
@@ -163,7 +152,7 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.search),
             color: Colors.white, // Set icon color to white
             onPressed: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => SearchPage (),
@@ -175,7 +164,7 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.movie),
             color: Colors.white, // Set icon color to white
             onPressed: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => FavoriteMoviesPage(),
@@ -187,7 +176,7 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.person_3_rounded),
             color: Colors.white, // Set icon color to white
             onPressed: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => FavoriteActorsPage(),
