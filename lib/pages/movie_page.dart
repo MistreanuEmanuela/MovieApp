@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import '../models/movie.dart';
 import '../models/genre.dart';
-import '../models/producer.dart'; // Import Producer model
+import '../models/producer.dart';
 import '../helpers/database_helper.dart';
 import '../models/actor.dart';
 import '../models/role.dart';
 import '../user_preferinces.dart';
 import '../pages/actor_page.dart';
+import '../pages/favorite_items_page.dart';
+import '../pages/search_page.dart';
+
+// Import the AnimatedDialog widget
+import '../animated_dialog.dart';
+
 class MoviePage extends StatefulWidget {
   final int movieId;
 
@@ -16,35 +22,101 @@ class MoviePage extends StatefulWidget {
   _MoviePageState createState() => _MoviePageState();
 }
 
-
 class _MoviePageState extends State<MoviePage> {
-  late int userId ;
-  late bool isFavorite =false;
+  late int userId;
+  late bool isFavorite = false;
 
   @override
- void initState() {
-  super.initState();
-  
-  // Retrieve userId first
-  UserPreferences.getUserId().then((value) {
-    setState(() {
-      userId = value!;
-      
-      // Once userId is retrieved, then proceed to check preferences
-      DatabaseHelper().checkPreferences(userId, widget.movieId).then((isFav) {
-        setState(() {
-          isFavorite = isFav;
+  void initState() {
+    super.initState();
+
+    // Retrieve userId first
+    UserPreferences.getUserId().then((value) {
+      setState(() {
+        userId = value!;
+
+        // Once userId is retrieved, then proceed to check preferences
+        DatabaseHelper().checkPreferences(userId, widget.movieId).then((isFav) {
+          setState(() {
+            isFavorite = isFav;
+          });
         });
       });
     });
-  });
-}
+  }
+
+  void _showAnimatedDialog() {
+    showDialog(
+      context: context,
+       builder: (context) => AnimatedDialog(
+      icon: Icons.favorite, // Pass the icon you want to display
+      message: 'Movie added to favorites!', // Pass the message you want to display
+    ),
+    );
+  }
+   void _showAnimatedDialogDeleted() {
+    showDialog(
+      context: context,
+       builder: (context) => AnimatedDialog(
+      icon: Icons.heart_broken, // Pass the icon you want to display
+      message: 'Movie deleted from favorites!', // Pass the message you want to display
+    ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Movie Details'),
+        backgroundColor: const Color.fromARGB(255, 2, 28, 70),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SearchPage(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.favorite_outlined),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoriteItemsPage(),
+                ),
+              );
+            },
+          ),
+        ],
+        title: SizedBox(
+          width: 250, // Adjust this value as needed
+          child: Center(
+            child: GestureDetector(
+              onTap: () {
+                // Navigate to homepage when image is tapped
+                Navigator.pushNamed(context, '/homepage');
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 50.0), // Adjust this value as needed
+                  Image.asset(
+                    'assets/images/image.png', // Change this to the path of your logo image
+                    width: 150.0, // Adjust the width as needed
+                  ),
+                  SizedBox(width: 0.0), // Adjust this value as needed
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
       body: Stack(
         children: [
@@ -108,7 +180,7 @@ class _MoviePageState extends State<MoviePage> {
                             ),
                             isFavorite
                                 ? IconButton(
-                                      icon: Icon(
+                                    icon: Icon(
                                       Icons.favorite,
                                       color: const Color.fromARGB(255, 255, 0, 0),
                                       size: 40,
@@ -118,13 +190,11 @@ class _MoviePageState extends State<MoviePage> {
                                       setState(() {
                                         isFavorite = false;
                                       });
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Movie deleted')),
-                                      );
+                                     _showAnimatedDialogDeleted();
                                     },
                                   )
                                 : IconButton(
-                                     icon: Icon(
+                                    icon: Icon(
                                       Icons.favorite_border_outlined,
                                       color: Colors.white,
                                       size: 40,
@@ -134,9 +204,7 @@ class _MoviePageState extends State<MoviePage> {
                                       setState(() {
                                         isFavorite = true;
                                       });
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Movie favorited')),
-                                      );
+                                      _showAnimatedDialog(); // Show the animated dialog
                                     },
                                   ),
                           ],
@@ -252,145 +320,146 @@ class _MoviePageState extends State<MoviePage> {
       ],
     );
   }
-void _showProducerInfoDialog(BuildContext context, Producer producer) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        contentPadding: EdgeInsets.zero,
-        content: Container(
-          width: MediaQuery.of(context).size.width * 0.8,
-          padding: EdgeInsets.only(top: 8.0, right: 8.0), // Add padding
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
-              ),
-            ],
-          ),
-          child: Stack(
-            alignment: Alignment.topRight, // Align Stack to top right
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 0, 0),
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundImage: AssetImage(producer.photoPath),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    producer.name,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                    child: Center( // Centering the text horizontally and vertically
-                      child: Text(
-                        '${producer.bio}',
-                        textAlign: TextAlign.center, // Align text to center
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+
+  void _showProducerInfoDialog(BuildContext context, Producer producer) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            padding: EdgeInsets.only(top: 8.0, right: 8.0), // Add padding
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: Offset(0, 3), // changes position of shadow
                 ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
-Widget _buildActors(List<Actor> actors) {
-  return Container(
-    height: 170,
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: actors.map((actor) {
-          return SizedBox(
-            width: 160,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ActorPage(actorId: actor.id!),
-                  ),
-                );
-              },
-              child: Container(
-                margin: EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Column(
+              ],
+            ),
+            child: Stack(
+              alignment: Alignment.topRight, // Align Stack to top right
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
+                  children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.fromLTRB(20.0, 20.0, 0, 0),
                       child: CircleAvatar(
-                        radius: 40,
-                        backgroundImage: AssetImage(actor.photoPath),
+                        radius: 60,
+                        backgroundImage: AssetImage(producer.photoPath),
                       ),
                     ),
-                    SizedBox(height: 8.0),
+                    SizedBox(height: 10),
                     Text(
-                      actor.name,
-                      style: TextStyle(fontSize: 14.0, color: Colors.black),
+                      producer.name,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    SizedBox(height: 5.0),
-                    FutureBuilder<Role>(
-                      future: DatabaseHelper().getRoleForMovieActor(widget.movieId, actor.id!),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else if (!snapshot.hasData) {
-                          return Text('Role not found');
-                        } else {
-                          return Text(
-                            snapshot.data!.name,
-                            style: TextStyle(fontSize: 12.0),
-                          );
-                        }
-                      },
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      child: Center( // Centering the text horizontally and vertically
+                        child: Text(
+                          '${producer.bio}',
+                          textAlign: TextAlign.center, // Align text to center
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
                     ),
+                    SizedBox(height: 10),
                   ],
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              ],
             ),
-          );
-        }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildActors(List<Actor> actors) {
+    return Container(
+      height: 170,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: actors.map((actor) {
+            return SizedBox(
+              width: 160,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ActorPage(actorId: actor.id!),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundImage: AssetImage(actor.photoPath),
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        actor.name,
+                        style: TextStyle(fontSize: 14.0, color: Colors.black),
+                      ),
+                      SizedBox(height: 5.0),
+                      FutureBuilder<Role>(
+                        future: DatabaseHelper().getRoleForMovieActor(widget.movieId, actor.id!),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else if (!snapshot.hasData) {
+                            return Text('Role not found');
+                          } else {
+                            return Text(
+                              snapshot.data!.name,
+                              style: TextStyle(fontSize: 12.0),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
-
-}

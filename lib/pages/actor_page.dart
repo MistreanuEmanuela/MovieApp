@@ -4,6 +4,9 @@ import '../helpers/database_helper.dart';
 import '../models/movie.dart';
 import '../user_preferinces.dart'; // Fixed import path
 import '../pages/movie_page.dart';
+import '../animated_dialog.dart';
+import '../pages/favorite_items_page.dart';
+import '../pages/search_page.dart';
 
 class ActorPage extends StatefulWidget {
   final int actorId;
@@ -54,12 +57,77 @@ class _ActorPageState extends State<ActorPage> {
       });
     }
   }
-
+  void _showAnimatedDialog() {
+    showDialog(
+      context: context,
+       builder: (context) => AnimatedDialog(
+      icon: Icons.favorite, // Pass the icon you want to display
+      message: 'Actor added to favorites!', // Pass the message you want to display
+    ),
+    );
+  }
+   void _showAnimatedDialogDeleted() {
+    showDialog(
+      context: context,
+       builder: (context) => AnimatedDialog(
+      icon: Icons.heart_broken, // Pass the icon you want to display
+      message: 'Actor deleted from favorites!', // Pass the message you want to display
+    ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Actor Details'),
+        backgroundColor: const Color.fromARGB(255, 2, 28, 70),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SearchPage(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.favorite_outlined),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoriteItemsPage(),
+                ),
+              );
+            },
+          ),
+        ],
+        title: SizedBox(
+          width: 250, // Adjust this value as needed
+          child: Center(
+            child: GestureDetector(
+              onTap: () {
+                // Navigate to homepage when image is tapped
+                Navigator.pushNamed(context, '/homepage');
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 50.0), // Adjust this value as needed
+                  Image.asset(
+                    'assets/images/image.png', // Change this to the path of your logo image
+                    width: 150.0, // Adjust the width as needed
+                  ),
+                  SizedBox(width: 0.0), // Adjust this value as needed
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
       body: Stack(
         children: [
@@ -115,9 +183,12 @@ class _ActorPageState extends State<ActorPage> {
                               setState(() {
                                 isFavorite = !isFavorite;
                               });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(isFavorite ? 'Actor favorited' : 'Actor removed from favorites')),
-                              );
+                              if (isFavorite){
+                                _showAnimatedDialog();
+                              }
+                               else{
+                                _showAnimatedDialogDeleted();
+                              }
                             },
                           ),
                         ),

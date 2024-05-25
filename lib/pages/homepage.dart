@@ -137,66 +137,86 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  AppBar(
-      backgroundColor: const Color.fromARGB(255, 2, 28, 70),
-      leading: IconButton(
-        icon: Icon(Icons.exit_to_app), // Changed to exit icon
-        color: Colors.white,
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Are you sure you want to disconnect?"),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                    },
-                    child: Text("No"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                    
-                      Navigator.of(context).pop();
-                      Navigator.pushNamed(context, '/'); // Close the dialog
-                    },
-                    child: Text("Yes"),
-                  ),
-                ],
-              );
-            },
+      appBar: AppBar(
+  backgroundColor: const Color.fromARGB(255, 2, 28, 70),
+  leading: IconButton(
+    icon: Icon(Icons.exit_to_app), // Changed to exit icon
+    color: Colors.white,
+    onPressed: () {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Are you sure you want to disconnect?"),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: Text("No"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushNamed(context, '/'); // Close the dialog
+                },
+                child: Text("Yes"),
+              ),
+            ],
           );
         },
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.search),
-          color: Colors.white,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SearchPage(),
-              ),
-            );
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.favorite_outlined),
-          color: Colors.white,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FavoriteItemsPage(),
-              ),
-            );
-          },
-        ),
-       
-      ],
+      );
+    },
+  ),
+  actions: [
+    IconButton(
+      icon: Icon(Icons.search),
+      color: Colors.white,
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchPage(),
+          ),
+        );
+      },
     ),
+    IconButton(
+      icon: Icon(Icons.favorite_outlined),
+      color: Colors.white,
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FavoriteItemsPage(),
+          ),
+        );
+      },
+    ),
+  ],
+  title: SizedBox(
+    width: 250, // Adjust this value as needed
+     child: Center(
+          child: GestureDetector(
+            onTap: () {
+              // Navigate to homepage when image is tapped
+              Navigator.pushNamed(context, '/homepage');
+            },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(width: 50.0), // Adjust this value as needed
+          Image.asset(
+            'assets/images/image.png', // Change this to the path of your logo image
+            width: 150.0, // Adjust the width as needed
+          ),
+          SizedBox(width: 0.0), // Adjust this value as needed
+        ],
+      ),
+    ),
+     ),
+  ),
+),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(

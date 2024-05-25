@@ -39,6 +39,8 @@ dependencies:
   path: ^1.8.0
   path_provider: any
   shared_preferences: ^2.0.8
+  animated_dialog_box: ^2.0.0
+
   
 
 dev_dependencies:

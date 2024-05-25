@@ -153,7 +153,7 @@ class _SearchPageState extends State<SearchPage> {
                                 ],
                               ),
                               child: ListTile(
-                                contentPadding: EdgeInsets.all(5.0),
+                                contentPadding: const EdgeInsets.all(5.0),
                                 leading: Container(
                                   height: 100.0, // Changed height to 100.0
                                   width: 70.0,   // Adjust the width as desired
@@ -181,7 +181,7 @@ class _SearchPageState extends State<SearchPage> {
                                   children: [
                                     Text(
                                       description,
-                                      style: TextStyle(color: Color.fromRGBO(114, 114, 114, 1)), // Change text color to grey
+                                      style: const TextStyle(color: Color.fromRGBO(114, 114, 114, 1)), // Change text color to grey
                                     ),
                                     SizedBox(height: 4),
                                     Text(
