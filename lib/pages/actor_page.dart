@@ -4,7 +4,7 @@ import '../helpers/database_helper.dart';
 import '../models/movie.dart';
 import '../user_preferinces.dart'; // Fixed import path
 import '../pages/movie_page.dart';
-import '../animated_dialog.dart';
+import '../widgets/animated_dialog.dart';
 import '../pages/favorite_items_page.dart';
 import '../pages/search_page.dart';
 
@@ -21,7 +21,7 @@ class _ActorPageState extends State<ActorPage> {
   late int userId;
   late bool isFavorite = false;
   bool showBibliography = false;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   double _bottomContainerHeight = 0;
 
   @override
@@ -31,7 +31,6 @@ class _ActorPageState extends State<ActorPage> {
       setState(() {
         userId = value!;
 
-        // Once userId is retrieved, then proceed to check preferences
         DatabaseHelper().checkPreferencesActor(userId, widget.actorId).then((isFav) {
           setState(() {
             isFavorite = isFav;
@@ -61,9 +60,9 @@ class _ActorPageState extends State<ActorPage> {
     showDialog(
       context: context,
        builder: (context) => AnimatedDialog(
-      icon: Icons.favorite, // Pass the icon you want to display
+      icon: Icons.favorite, 
       message: 'Actor added to favorites!',
-      color: Colors.red, // Pass the message you want to display
+      color: Colors.red, 
     ),
     );
   }
@@ -71,9 +70,9 @@ class _ActorPageState extends State<ActorPage> {
     showDialog(
       context: context,
        builder: (context) => AnimatedDialog(
-      icon: Icons.heart_broken, // Pass the icon you want to display
+      icon: Icons.heart_broken,
       message: 'Actor deleted from favorites!',
-      color: Colors.red,  // Pass the message you want to display
+      color: Colors.red,  
     ),
     );
   }
@@ -84,7 +83,7 @@ class _ActorPageState extends State<ActorPage> {
         backgroundColor: const Color.fromARGB(255, 2, 28, 70),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             color: Colors.white,
             onPressed: () {
               Navigator.push(
@@ -96,7 +95,7 @@ class _ActorPageState extends State<ActorPage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.favorite_outlined),
+            icon: const Icon(Icons.favorite_outlined),
             color: Colors.white,
             onPressed: () {
               Navigator.push(
@@ -109,22 +108,21 @@ class _ActorPageState extends State<ActorPage> {
           ),
         ],
         title: SizedBox(
-          width: 250, // Adjust this value as needed
+          width: 250,
           child: Center(
             child: GestureDetector(
               onTap: () {
-                // Navigate to homepage when image is tapped
                 Navigator.pushNamed(context, '/homepage');
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(width: 50.0), // Adjust this value as needed
+                  const SizedBox(width: 50.0), 
                   Image.asset(
-                    'assets/images/image.png', // Change this to the path of your logo image
-                    width: 150.0, // Adjust the width as needed
+                    'assets/images/image.png',
+                    width: 150.0, 
                   ),
-                  SizedBox(width: 0.0), // Adjust this value as needed
+                  const SizedBox(width: 0.0), 
                 ],
               ),
             ),
@@ -136,9 +134,9 @@ class _ActorPageState extends State<ActorPage> {
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/first_page.jpg'), // Your background image here
+                image: AssetImage('assets/images/first_page.jpg'), 
                 fit: BoxFit.cover,
               ),
             ),
@@ -149,16 +147,16 @@ class _ActorPageState extends State<ActorPage> {
               future: DatabaseHelper().getActorById(widget.actorId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData) {
-                  return Center(child: Text('Actor not found'));
+                  return const Center(child: Text('Actor not found'));
                 } else {
                   final Actor actor = snapshot.data!;
                   return Container(
                     padding: const EdgeInsets.all(16.0),
-                    color: Colors.black.withOpacity(0.0), // Adds a semi-transparent overlay
+                    color: Colors.black.withOpacity(0.0), 
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -166,12 +164,12 @@ class _ActorPageState extends State<ActorPage> {
                           alignment: Alignment.topRight,
                           child: IconButton(
                             icon: isFavorite
-                                ? Icon(
+                                ? const Icon(
                                     Icons.favorite,
-                                    color: const Color.fromARGB(255, 255, 0, 0),
+                                    color: Color.fromARGB(255, 255, 0, 0),
                                     size: 40,
                                   )
-                                : Icon(
+                                : const Icon(
                                     Icons.favorite_border_outlined,
                                     color: Colors.white,
                                     size: 40,
@@ -200,27 +198,27 @@ class _ActorPageState extends State<ActorPage> {
                             backgroundImage: AssetImage(actor.photoPath),
                           ),
                         ),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                         Center(
                           child: Text(
                             actor.name,
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.white),
+                            style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
-                            Icon(Icons.person, color: Colors.white, size: 18),
-                            SizedBox(width: 4.0),
+                             const  Icon(Icons.person, color: Colors.white, size: 18),
+                            const SizedBox(width: 4.0),
                             Text(
                               'Bio: ${actor.bio}',
-                              style: TextStyle(fontSize: 16.0, color: Colors.white),
+                              style: const TextStyle(fontSize: 16.0, color: Colors.white),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
-                        Row(
+                        const SizedBox(height: 8.0),
+                        const Row(
                           children: [
                             Icon(Icons.cake, color: Colors.white, size: 18),
                             SizedBox(width: 4.0),
@@ -230,29 +228,29 @@ class _ActorPageState extends State<ActorPage> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 16.0),
-                        Text(
+                        const SizedBox(height: 16.0),
+                        const Text(
                           'Movies:',
                           style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         FutureBuilder<List<Movie>>(
   future: DatabaseHelper().getMoviesForActor(widget.actorId),
   builder: (context, snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     } else if (snapshot.hasError) {
-      return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+      return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-      return Center(child: Text('No movies found', style: TextStyle(color: Colors.white)));
+      return const Center(child: Text('No movies found', style: TextStyle(color: Colors.white)));
     } else {
       final movies = snapshot.data!;
       return Container(
-        constraints: BoxConstraints(maxHeight: 270), // Limiting max height to 300
-        child: SingleChildScrollView( // Wrapping with SingleChildScrollView
+        constraints: const BoxConstraints(maxHeight: 270),
+        child: SingleChildScrollView( 
           child: ListView.builder(
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: movies.length,
             itemBuilder: (context, index) {
               return Column(
@@ -274,22 +272,22 @@ class _ActorPageState extends State<ActorPage> {
                           children: [
                             Text(
                               movies[index].year.toString(),
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             ),
-                            SizedBox(width: 8.0),
+                            const SizedBox(width: 8.0),
                             Container(
                               width: 8,
                               height: 8,
-                              decoration: BoxDecoration(
+                              decoration:const  BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
                             ),
-                            SizedBox(width: 8.0),
+                            const SizedBox(width: 8.0),
                             Expanded(
                               child: Text(
                                 movies[index].title,
-                                style: TextStyle(fontSize: 16.0, color: Colors.white),
+                                style: const TextStyle(fontSize: 16.0, color: Colors.white),
                               ),
                             ),
                           ],
@@ -298,8 +296,8 @@ class _ActorPageState extends State<ActorPage> {
                     ),
                   ),
                   if (index != movies.length - 1)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    const Padding(
+                      padding:  EdgeInsets.symmetric(horizontal: 8.0),
                       child: Divider(color: Colors.white),
                     ),
                 ],
@@ -312,7 +310,7 @@ class _ActorPageState extends State<ActorPage> {
   },
 ),
   
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                       ],
                     ),
                   );
@@ -321,7 +319,7 @@ class _ActorPageState extends State<ActorPage> {
             ),
           ),
           AnimatedPositioned(
-            duration: Duration(milliseconds: 400),
+            duration: const Duration(milliseconds: 400),
             bottom: showBibliography ? 0 : -_bottomContainerHeight,
             left: 0,
             right: 0,
@@ -335,7 +333,7 @@ class _ActorPageState extends State<ActorPage> {
               child: Container(
                 decoration: BoxDecoration(
                   color: showBibliography ? Colors.white.withOpacity(1.0) : Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+                  borderRadius:const  BorderRadius.vertical(top: Radius.circular(20.0)),
                 ),
                 padding: EdgeInsets.fromLTRB(16.0, showBibliography ? 0.0 : 0.0, 16.0, showBibliography ? 0.0 : 0.0),
                 child: Column(
@@ -356,12 +354,12 @@ class _ActorPageState extends State<ActorPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8.0),
+                    const SizedBox(height: 8.0),
                     Expanded(
                       child: AnimatedOpacity(
-                        duration: Duration(milliseconds: 300),
+                        duration:const  Duration(milliseconds: 300),
                         opacity: showBibliography ? 1.0 : 0.0,
-                        child: SingleChildScrollView( // Add SingleChildScrollView
+                        child: const SingleChildScrollView( // Add SingleChildScrollView
                           child: Text(
                             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie, erat ac accumsan convallis, ligula orci iaculis lectus, a semper ante eros elementum enim. Nulla facilisi. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer a urna ut urna feugiat vehicula. Nulla blandit enim quis mauris semper fringilla. Donec ornare imperdiet sodales. In maximus urna eget metus sodales lacinia vel et ante. Curabitur iaculis lectus nec ipsum rutrum congue. Mauris semper sit amet nunc hendrerit ultricies. Duis vitae nisl non nibh feugiat vulputate sit amet vel arcu. Etiam tristique, arcu id fermentum sagittis, felis metus rutrum turpis, a viverra purus purus at massa. Fusce vitae urna metus. Fusce nec justo non dolor posuere dictum vel eget ligula. Quisque ac interdum purus. Praesent suscipit urna sit amet lacus viverra, a ullamcorper ex cursus....',
                             style: TextStyle(fontSize: 16.0),

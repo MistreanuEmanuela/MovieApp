@@ -166,7 +166,8 @@ class _SearchPageState extends State<SearchPage> {
                                     margin: const EdgeInsets.symmetric(vertical: 8.0),
                                     padding: const EdgeInsets.all(6.0),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Colors.white.withOpacity(0.7),
+
                                       borderRadius: BorderRadius.circular(10.0),
                                       boxShadow: [
                                         BoxShadow(
@@ -209,14 +210,14 @@ class _SearchPageState extends State<SearchPage> {
                                           Text(
                                             description,
                                             style: const TextStyle(
-                                              color: Color.fromRGBO(114, 114, 114, 1),
+                                              color: Color.fromRGBO(69, 69, 69, 1),
                                             ),
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
                                             '${movie.year} | ${movie.duration}',
                                             style: const TextStyle(
-                                              color: Color.fromRGBO(114, 114, 114, 1),
+                                              color: Color.fromRGBO(69, 69, 69, 1),
                                             ),
                                           ),
                                         ],

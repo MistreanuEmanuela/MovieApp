@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../helpers/database_helper.dart';
 import '../models/user.dart';
-import '../animated_dialog.dart';
+import '../widgets/animated_dialog.dart';
 
 class RegisterPage extends StatefulWidget {
   @override

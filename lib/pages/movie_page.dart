@@ -9,7 +9,7 @@ import '../user_preferinces.dart';
 import '../pages/actor_page.dart';
 import '../pages/favorite_items_page.dart';
 import '../pages/search_page.dart';
-import '../animated_dialog.dart';
+import '../widgets/animated_dialog.dart';
 
 class MoviePage extends StatefulWidget {
   final int movieId;
@@ -252,9 +252,9 @@ class _MoviePageState extends State<MoviePage> {
                           'Producers:',
                           style: TextStyle(fontSize: 16.0, color: Colors.white,  fontFamily: 'Roboto'),
                         ),
-                        const SizedBox(height: 16.0),
+                        const SizedBox(height: 8.0),
                         _buildProducers(producers),
-                        const SizedBox(height: 16.0),
+                        const SizedBox(height: 8.0),
                         const Text(
                           'Actors:',
                           style: TextStyle(fontSize: 16.0, color: Colors.white,  fontFamily: 'Roboto'),
@@ -390,7 +390,7 @@ class _MoviePageState extends State<MoviePage> {
 
   Widget _buildActors(List<Actor> actors) {
     return SizedBox(
-      height: 170,
+      height: 175,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(

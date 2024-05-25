@@ -7,7 +7,7 @@ class AnimatedDialog extends StatefulWidget {
   final Duration duration;
   final Color color; 
 
-  AnimatedDialog({
+  const AnimatedDialog({
     required this.message,
     required this.icon,
     required this.color,
@@ -28,7 +28,7 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
     );
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
     _controller.forward();
@@ -45,7 +45,7 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
       child: ScaleTransition(
         scale: _animation,
         child: Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
@@ -58,12 +58,12 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
                 size: 60,
                 color: widget.color, 
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 widget.message,
-                style: TextStyle(fontSize: 20, fontFamily: 'Roboto'),
+                style: const TextStyle(fontSize: 20, fontFamily: 'Roboto'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
              
             ],
           ),

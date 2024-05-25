@@ -19,6 +19,23 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 50, 10, 119)),
         useMaterial3: true,
+          textTheme: TextTheme(
+          bodyLarge: TextStyle(fontFamily: 'Roboto'),
+          bodyMedium: TextStyle(fontFamily: 'Roboto'),
+          headlineLarge: TextStyle(fontFamily: 'Roboto'),
+          headlineMedium: TextStyle(fontFamily: 'Roboto'),
+          headlineSmall: TextStyle(fontFamily: 'Roboto'),
+          titleLarge: TextStyle(fontFamily: 'Roboto'),
+          titleMedium: TextStyle(fontFamily: 'Roboto'),
+          titleSmall: TextStyle(fontFamily: 'Roboto'),
+          labelLarge: TextStyle(fontFamily: 'Roboto'),
+          labelMedium: TextStyle(fontFamily: 'Roboto'),
+          labelSmall: TextStyle(fontFamily: 'Roboto'),
+          bodySmall: TextStyle(fontFamily: 'Roboto'),
+          displayLarge: TextStyle(fontFamily: 'Roboto'),
+          displayMedium: TextStyle(fontFamily:  'Roboto'),
+          displaySmall: TextStyle(fontFamily: 'Roboto'),
+        ),
       ),
       home: const MyHomePage(title: 'Movie App'),
       routes: {
@@ -61,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
   void initializeApp() async {
-    await insertInitialData();
+    // await insertInitialData();
   }
 
   @override
@@ -75,6 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
             fit: BoxFit.cover,
           ),
         ),
+        
         child: Stack(
           children: <Widget>[
             Align(

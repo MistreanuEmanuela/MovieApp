@@ -11,7 +11,7 @@ import './models/role.dart';
 Future<void> insertInitialData() async {
   final dbHelper = DatabaseHelper();
 
-  // Example data
+
  var movie = Movie(
   title: 'Inception',
   year: 2010,
@@ -19,37 +19,22 @@ Future<void> insertInitialData() async {
   duration: '148 minutes',
   photoPath: 'lib/images/movies/inception.png', // Relative to the lib directory
 );
- var movie1 = Movie(
-  title: 'Inception1',
-  year: 2010,
-  plot: 'A thief who steals corporate secrets through the use of dream-sharing technology.',
-  duration: '148 minutes',
-  photoPath: 'lib/images/movies/inception.png', // Relative to the lib directory
-);
 
- var movie2 = Movie(
-  title: 'Inception2',
-  year: 2010,
-  plot: 'A thief who steals corporate secrets through the use of dream-sharing technology.',
-  duration: '148 minutes',
-  photoPath: 'lib/images/movies/inception.png', // Relative to the lib directory
-);
-//  await dbHelper.insertMovie(movie);
-//   await dbHelper.insertMovie(movie1);
-//   await dbHelper.insertMovie(movie2);
+
+ await dbHelper.insertMovie(movie);
 
 var actor = Actor(
   name: 'Leonardo DiCaprio',
   bio: 'An American actor and film producer.',
   photoPath: 'lib/images/actors/leo.jpg', // Relative to the lib directory
 );
-// await dbHelper.insertActor(actor);
+await dbHelper.insertActor(actor);
 var producer = Producer(
   name: 'Christopher Nolan',
   bio: 'An English-American film director, producer, and screenwriter.',
   photoPath: 'lib/images/producers/nolan.jpg', // Relative to the lib directory
 );
-// await dbHelper.insertProducer(producer);
+await dbHelper.insertProducer(producer);
   var role = Role(
     name: 'Dominick Cobb',
   );

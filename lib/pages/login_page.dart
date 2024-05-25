@@ -5,7 +5,7 @@ import 'dart:ui';
 import '../user_preferinces.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
-import '../animated_dialog.dart';
+import '../widgets/animated_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   @override

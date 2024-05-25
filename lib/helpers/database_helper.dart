@@ -47,7 +47,7 @@ class DatabaseHelper {
       "CREATE TABLE movies(id INTEGER PRIMARY KEY, title TEXT, year INTEGER, plot TEXT, duration TEXT, photo_path TEXT)",
     );
     await db.execute(
-      "CREATE TABLE actors(id INTEGER PRIMARY KEY, name TEXT, bio TEXT, photo_path TEXT)",
+      "CREATE TABLE actors(id INTEGER PRIMARY KEY, name TEXT, bio TEXT, photo_path TEXT, birthdate TEXT, bibliography TEXT)",
     );
     await db.execute(
       "CREATE TABLE producers(id INTEGER PRIMARY KEY, name TEXT, bio TEXT, photo_path TEXT)",
@@ -217,18 +217,15 @@ class DatabaseHelper {
     });
   }
 
-     Future<List<Map<String, dynamic>>> getAllFavoriteMovies() async {
-    final db = await database;
-    return db.query('favorite_movies');
-    
-  }
-   Future<List<Actor>> actors() async {
+  Future<List<Actor>> actors() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('actors');
     return List.generate(maps.length, (i) {
       return Actor.fromMap(maps[i]);
     });
   }
+
+
  Future<List<Role>> roles() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('roles');
@@ -244,6 +241,11 @@ class DatabaseHelper {
     });
   }
 
+  Future<List<Map<String, dynamic>>> getAllFavoriteMovies() async {
+    final db = await database;
+    return db.query('favorite_movies');
+    
+  }
 Future<List<Movie>> moviesByYearDesc() async {
   final db = await database;
   final List<Map<String, dynamic>> maps = await db.query(
@@ -254,6 +256,34 @@ Future<List<Movie>> moviesByYearDesc() async {
     return Movie.fromMap(maps[i]);
   });
 }
+
+ Future<void> insertFavoriteActor(int actorId, int userId) async {
+    final db = await database;
+    await db.insert(
+      'favorite_actors',
+      {'id_actor': actorId, 'id_user': userId},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> deleteFavoriteMovie(int movieId, int userId) async {
+    final db = await database;
+    await db.delete(
+      'favorite_movies',
+      where: 'id_movie = ? AND id_user = ?',
+      whereArgs: [movieId, userId],
+    );
+  }
+
+  Future<void> deleteFavoriteActor(int actorId, int userId) async {
+    final db = await database;
+    await db.delete(
+      'favorite_actors',
+      where: 'id_actor = ? AND id_user = ?',
+      whereArgs: [actorId, userId],
+    );
+  }
+  
 Future<void> deleteMovie(int id) async {
     final db = await database;
     await db.delete(
@@ -284,7 +314,7 @@ Future<void> deleteGenre(int id) async {
       'genres',
       columns: ['id', 'name'],
       where: 'id IN (SELECT id_genre FROM genre_movies WHERE id_movie = ?)',
-      whereArgs: [movieId ?? 0], // Handle nullable movieId
+      whereArgs: [movieId], 
     );
 
     return List.generate(maps.length, (i) {
@@ -353,7 +383,7 @@ Future<List<Genre>> getAllGenres() async {
       return Producer.fromMap(maps[i]);
     });
   } else {
-    return []; // Return an empty list if no producers found
+    return []; 
   }
 }
   Future<List<Actor>> getActorsForMovie(int movieId) async {
@@ -372,7 +402,7 @@ Future<List<Genre>> getAllGenres() async {
       return Actor.fromMap(maps[i]);
     });
   } else {
-    return []; // Return an empty list if no producers found
+    return []; 
   }
   }
 
@@ -403,32 +433,7 @@ Future<List<Genre>> getAllGenres() async {
   }
 
 
-  Future<void> insertFavoriteActor(int actorId, int userId) async {
-    final db = await database;
-    await db.insert(
-      'favorite_actors',
-      {'id_actor': actorId, 'id_user': userId},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  Future<void> deleteFavoriteMovie(int movieId, int userId) async {
-    final db = await database;
-    await db.delete(
-      'favorite_movies',
-      where: 'id_movie = ? AND id_user = ?',
-      whereArgs: [movieId, userId],
-    );
-  }
-
-  Future<void> deleteFavoriteActor(int actorId, int userId) async {
-    final db = await database;
-    await db.delete(
-      'favorite_actors',
-      where: 'id_actor = ? AND id_user = ?',
-      whereArgs: [actorId, userId],
-    );
-  }
+ 
 
   Future<List<Movie>> getFavoriteMoviesForUser(int userId) async {
     final db = await database;
