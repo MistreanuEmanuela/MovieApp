@@ -37,9 +37,9 @@ class _FavoriteMoviesPage extends State<FavoriteMoviesPage> {
       future: _moviesFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+          return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
         } else {
           final movies = snapshot.data!;
           return ListView.builder(

@@ -42,7 +42,7 @@ class _SearchPageState extends State<SearchPage> {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 2, 28, 70),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
             Navigator.pop(context);
@@ -50,7 +50,7 @@ class _SearchPageState extends State<SearchPage> {
         ),
         actions: [
     IconButton(
-      icon: Icon(Icons.search),
+      icon: const Icon(Icons.search),
       color: Colors.white,
       onPressed: () {
         Navigator.push(
@@ -62,7 +62,7 @@ class _SearchPageState extends State<SearchPage> {
       },
     ),
     IconButton(
-      icon: Icon(Icons.favorite_outlined),
+      icon: const Icon(Icons.favorite_outlined),
       color: Colors.white,
       onPressed: () {
         Navigator.push(
@@ -75,22 +75,21 @@ class _SearchPageState extends State<SearchPage> {
     ),
   ],
   title: SizedBox(
-    width: 250, // Adjust this value as needed
+    width: 250, 
      child: Center(
           child: GestureDetector(
             onTap: () {
-              // Navigate to homepage when image is tapped
               Navigator.pushNamed(context, '/homepage');
             },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(width: 50.0), // Adjust this value as needed
+          const  SizedBox(width: 50.0), 
           Image.asset(
-            'assets/images/image.png', // Change this to the path of your logo image
-            width: 150.0, // Adjust the width as needed
+            'assets/images/image.png', 
+            width: 150.0, 
           ),
-          SizedBox(width: 0.0), // Adjust this value as needed
+          const SizedBox(width: 0.0), 
         ],
       ),
     ),
@@ -100,7 +99,7 @@ class _SearchPageState extends State<SearchPage> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const  BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/first_page.jpg'),
                 fit: BoxFit.cover,
@@ -108,7 +107,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding:const  EdgeInsets.all(16.0),
             child: Column(
               children: [
                 TextField(
@@ -124,22 +123,22 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   onChanged: _onSearchChanged,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Expanded(
                   child: FutureBuilder<List<Movie>>(
                     future: _searchResultsFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Center(
                           child: Text(
                             'Error: ${snapshot.error}',
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white),
                           ),
                         );
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(
+                        return const Center(
                           child: Text(
                             'No movies found.',
                             style: TextStyle(fontSize: 18.0, color: Colors.white),
@@ -155,7 +154,7 @@ class _SearchPageState extends State<SearchPage> {
                               future: _databaseHelper.checkPreferences(1, movie.id!),
                               builder: (context, isFavSnapshot) {
                                 if (isFavSnapshot.connectionState == ConnectionState.waiting) {
-                                  return CircularProgressIndicator();
+                                  return const CircularProgressIndicator();
                                 } else if (isFavSnapshot.hasError) {
                                   return Text('Error: ${isFavSnapshot.error}');
                                 } else {
@@ -164,8 +163,8 @@ class _SearchPageState extends State<SearchPage> {
                                       ? movie.plot.substring(0, 80) + "..."
                                       : movie.plot;
                                   return Container(
-                                    margin: EdgeInsets.symmetric(vertical: 8.0),
-                                    padding: EdgeInsets.all(6.0),
+                                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                                    padding: const EdgeInsets.all(6.0),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(10.0),
@@ -183,7 +182,7 @@ class _SearchPageState extends State<SearchPage> {
                                         height: 200.0,
                                         width: 80.0,
                                         decoration: BoxDecoration(
-                                          color: Color.fromARGB(255, 161, 38, 38),
+                                          color: const Color.fromARGB(255, 161, 38, 38),
                                           borderRadius: BorderRadius.circular(10.0),
                                         ),
                                         child: FractionallySizedBox(
@@ -199,7 +198,7 @@ class _SearchPageState extends State<SearchPage> {
                                       ),
                                       title: Text(
                                         movie.title,
-                                        style: TextStyle(
+                                        style: const  TextStyle(
                                           fontSize: 20,
                                           color: Colors.black,
                                         ),
@@ -213,21 +212,21 @@ class _SearchPageState extends State<SearchPage> {
                                               color: Color.fromRGBO(114, 114, 114, 1),
                                             ),
                                           ),
-                                          SizedBox(height: 4),
+                                          const SizedBox(height: 4),
                                           Text(
                                             '${movie.year} | ${movie.duration}',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               color: Color.fromRGBO(114, 114, 114, 1),
                                             ),
                                           ),
                                         ],
                                       ),
                                       trailing: isFav
-                                          ? Icon(
+                                          ? const Icon(
                                               Icons.favorite,
                                               color: Colors.red,
                                             )
-                                          : SizedBox(), // If not a favorite, show an empty SizedBox to maintain alignment
+                                          : SizedBox(), 
                                       onTap: () {
                                         Navigator.push(
                                           context,

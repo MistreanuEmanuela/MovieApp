@@ -9,8 +9,6 @@ import '../user_preferinces.dart';
 import '../pages/actor_page.dart';
 import '../pages/favorite_items_page.dart';
 import '../pages/search_page.dart';
-
-// Import the AnimatedDialog widget
 import '../animated_dialog.dart';
 
 class MoviePage extends StatefulWidget {
@@ -50,7 +48,8 @@ class _MoviePageState extends State<MoviePage> {
       context: context,
        builder: (context) => AnimatedDialog(
       icon: Icons.favorite, // Pass the icon you want to display
-      message: 'Movie added to favorites!', // Pass the message you want to display
+      message: 'Movie added to favorites!',
+      color: Colors.red, // Pass the message you want to display
     ),
     );
   }
@@ -59,7 +58,8 @@ class _MoviePageState extends State<MoviePage> {
       context: context,
        builder: (context) => AnimatedDialog(
       icon: Icons.heart_broken, // Pass the icon you want to display
-      message: 'Movie deleted from favorites!', // Pass the message you want to display
+      message: 'Movie deleted from favorites!',
+      color: Colors.red,  // Pass the message you want to display
     ),
     );
   }
@@ -71,7 +71,7 @@ class _MoviePageState extends State<MoviePage> {
         backgroundColor: const Color.fromARGB(255, 2, 28, 70),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             color: Colors.white,
             onPressed: () {
               Navigator.push(
@@ -83,7 +83,7 @@ class _MoviePageState extends State<MoviePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.favorite_outlined),
+            icon: const Icon(Icons.favorite_outlined),
             color: Colors.white,
             onPressed: () {
               Navigator.push(
@@ -96,22 +96,21 @@ class _MoviePageState extends State<MoviePage> {
           ),
         ],
         title: SizedBox(
-          width: 250, // Adjust this value as needed
+          width: 250, 
           child: Center(
             child: GestureDetector(
               onTap: () {
-                // Navigate to homepage when image is tapped
                 Navigator.pushNamed(context, '/homepage');
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(width: 50.0), // Adjust this value as needed
+                  const SizedBox(width: 50.0), 
                   Image.asset(
-                    'assets/images/image.png', // Change this to the path of your logo image
-                    width: 150.0, // Adjust the width as needed
+                    'assets/images/image.png', 
+                    width: 150.0, 
                   ),
-                  SizedBox(width: 0.0), // Adjust this value as needed
+                  const SizedBox(width: 0.0), 
                 ],
               ),
             ),
@@ -123,7 +122,7 @@ class _MoviePageState extends State<MoviePage> {
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/first_page.jpg'),
                 fit: BoxFit.cover,
@@ -143,12 +142,12 @@ class _MoviePageState extends State<MoviePage> {
                 ]),
                 builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(
-                        child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+                        child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
                   } else if (!snapshot.hasData) {
-                    return Center(child: Text('Movie not found', style: TextStyle(color: Colors.white)));
+                    return const Center(child: Text('Movie not found', style: TextStyle(color: Colors.white)));
                   } else {
                     final Movie movie = snapshot.data![0] as Movie;
                     final List<Genre> genres = snapshot.data![1] as List<Genre>;
@@ -160,16 +159,11 @@ class _MoviePageState extends State<MoviePage> {
                         Stack(
                           alignment: Alignment.topRight,
                           children: [
-                            Container(
+                            SizedBox(
                               width: double.infinity,
                               child: GestureDetector(
                                 onTap: () {
-                                  // Navigator.push(
-                                  //   // context,
-                                  //   // MaterialPageRoute(
-                                  //   //   builder: (context) => MovieImagePage(movieId: movie.id),
-                                  //   // ),
-                                  // );
+                                
                                 },
                                 child: Image.asset(
                                   movie.photoPath,
@@ -180,9 +174,9 @@ class _MoviePageState extends State<MoviePage> {
                             ),
                             isFavorite
                                 ? IconButton(
-                                    icon: Icon(
+                                    icon:  const Icon(
                                       Icons.favorite,
-                                      color: const Color.fromARGB(255, 255, 0, 0),
+                                      color: Color.fromARGB(255, 255, 0, 0),
                                       size: 40,
                                     ),
                                     onPressed: () async {
@@ -194,7 +188,7 @@ class _MoviePageState extends State<MoviePage> {
                                     },
                                   )
                                 : IconButton(
-                                    icon: Icon(
+                                    icon: const Icon(
                                       Icons.favorite_border_outlined,
                                       color: Colors.white,
                                       size: 40,
@@ -204,38 +198,38 @@ class _MoviePageState extends State<MoviePage> {
                                       setState(() {
                                         isFavorite = true;
                                       });
-                                      _showAnimatedDialog(); // Show the animated dialog
+                                      _showAnimatedDialog();
                                     },
                                   ),
                           ],
                         ),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               movie.title,
-                              style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold, color: Colors.white),
+                              style: const TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
-                            SizedBox(width: 8.0),
+                            const SizedBox(width: 8.0),
                             Text(
-                              '${movie.duration}',
-                              style: TextStyle(fontSize: 18.0, color: Colors.white),
+                              movie.duration,
+                              style: const TextStyle(fontSize: 18.0, color: Colors.white, fontFamily: 'Roboto'),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Text(
                           'Year: ${movie.year}',
-                          style: TextStyle(fontSize: 14.0, color: Colors.white),
+                          style: const TextStyle(fontSize: 14.0, color: Colors.white, fontFamily: 'Roboto'),
                         ),
-                        SizedBox(height: 2.0),
+                        const SizedBox(height: 2.0),
                         Wrap(
                           spacing: 8.0,
                           runSpacing: 4.0,
                           children: genres
                               .map((genre) => Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(10.0),
@@ -243,31 +237,31 @@ class _MoviePageState extends State<MoviePage> {
                                     ),
                                     child: Text(
                                       genre.name,
-                                      style: TextStyle(fontSize: 14.0, color: Colors.black),
+                                      style: const TextStyle(fontSize: 14.0, color: Colors.black, fontFamily: 'Roboto'),
                                     ),
                                   ))
                               .toList(),
                         ),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                         Text(
                           movie.plot,
-                          style: TextStyle(fontSize: 16.0, color: Colors.white),
+                          style: const TextStyle(fontSize: 16.0, color: Colors.white,  fontFamily: 'Roboto'),
                         ),
-                        SizedBox(height: 16.0),
-                        Text(
+                        const SizedBox(height: 16.0),
+                        const Text(
                           'Producers:',
-                          style: TextStyle(fontSize: 16.0, color: Colors.white),
+                          style: TextStyle(fontSize: 16.0, color: Colors.white,  fontFamily: 'Roboto'),
                         ),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                         _buildProducers(producers),
-                        SizedBox(height: 16.0),
-                        Text(
+                        const SizedBox(height: 16.0),
+                        const Text(
                           'Actors:',
-                          style: TextStyle(fontSize: 16.0, color: Colors.white),
+                          style: TextStyle(fontSize: 16.0, color: Colors.white,  fontFamily: 'Roboto'),
                         ),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                         _buildActors(actors),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                       ],
                     );
                   }
@@ -283,8 +277,8 @@ class _MoviePageState extends State<MoviePage> {
   Widget _buildProducers(List<Producer> producers) {
     return Stack(
       children: [
-        Container(
-          height: 150, // Adjust the height according to your needs
+        SizedBox(
+          height: 150, 
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: producers.length,
@@ -294,17 +288,17 @@ class _MoviePageState extends State<MoviePage> {
                   _showProducerInfoDialog(context, producers[index]);
                 },
                 child: Container(
-                  margin: EdgeInsets.all(8.0),
+                  margin: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
                       CircleAvatar(
                         radius: 40,
                         backgroundImage: AssetImage(producers[index].photoPath),
                       ),
-                      SizedBox(height: 8.0),
+                      const SizedBox(height: 8.0),
                       Text(
                         producers[index].name,
-                        style: TextStyle(fontSize: 14.0, color: Colors.white),
+                        style:const TextStyle(fontSize: 14.0, color: Colors.white),
                       ),
                     ],
                   ),
@@ -313,9 +307,8 @@ class _MoviePageState extends State<MoviePage> {
             },
           ),
         ),
-        // Overlay to dim the background
         Container(
-          color: Colors.black.withOpacity(0.2), // Adjust opacity as needed
+          color: Colors.black.withOpacity(0.2),
         ),
       ],
     );
@@ -329,7 +322,7 @@ class _MoviePageState extends State<MoviePage> {
           contentPadding: EdgeInsets.zero,
           content: Container(
             width: MediaQuery.of(context).size.width * 0.8,
-            padding: EdgeInsets.only(top: 8.0, right: 8.0), // Add padding
+            padding: const EdgeInsets.only(top: 8.0, right: 8.0), 
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.0),
               boxShadow: [
@@ -337,12 +330,12 @@ class _MoviePageState extends State<MoviePage> {
                   color: Colors.grey.withOpacity(0.5),
                   spreadRadius: 5,
                   blurRadius: 7,
-                  offset: Offset(0, 3), // changes position of shadow
+                  offset: const Offset(0, 3), 
                 ),
               ],
             ),
             child: Stack(
-              alignment: Alignment.topRight, // Align Stack to top right
+              alignment: Alignment.topRight, 
               children: [
                 Column(
                   mainAxisSize: MainAxisSize.min,
@@ -355,32 +348,33 @@ class _MoviePageState extends State<MoviePage> {
                         backgroundImage: AssetImage(producer.photoPath),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       producer.name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'Roboto'
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                      child: Center( // Centering the text horizontally and vertically
+                      child: Center( 
                         child: Text(
                           '${producer.bio}',
-                          textAlign: TextAlign.center, // Align text to center
-                          style: TextStyle(fontSize: 16),
+                          textAlign: TextAlign.center, 
+                          style: const TextStyle(fontSize: 16, fontFamily: 'Roboto'),
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                   ],
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: IconButton(
-                    icon: Icon(Icons.close),
+                    icon:  const Icon(Icons.close),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -395,7 +389,7 @@ class _MoviePageState extends State<MoviePage> {
   }
 
   Widget _buildActors(List<Actor> actors) {
-    return Container(
+    return SizedBox(
       height: 170,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -413,7 +407,7 @@ class _MoviePageState extends State<MoviePage> {
                   );
                 },
                 child: Container(
-                  margin: EdgeInsets.all(8.0),
+                  margin: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(10.0),
@@ -422,31 +416,31 @@ class _MoviePageState extends State<MoviePage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: EdgeInsets.only(top: 8.0),
+                        padding: const EdgeInsets.only(top: 8.0),
                         child: CircleAvatar(
                           radius: 40,
                           backgroundImage: AssetImage(actor.photoPath),
                         ),
                       ),
-                      SizedBox(height: 8.0),
+                      const SizedBox(height: 8.0),
                       Text(
                         actor.name,
-                        style: TextStyle(fontSize: 14.0, color: Colors.black),
+                        style: const TextStyle(fontSize: 14.0, color: Colors.black),
                       ),
-                      SizedBox(height: 5.0),
+                      const SizedBox(height: 5.0),
                       FutureBuilder<Role>(
                         future: DatabaseHelper().getRoleForMovieActor(widget.movieId, actor.id!),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return const CircularProgressIndicator();
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else if (!snapshot.hasData) {
-                            return Text('Role not found');
+                            return const Text('Role not found');
                           } else {
                             return Text(
                               snapshot.data!.name,
-                              style: TextStyle(fontSize: 12.0),
+                              style: const TextStyle(fontSize: 12.0),
                             );
                           }
                         },

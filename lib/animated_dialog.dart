@@ -5,10 +5,12 @@ class AnimatedDialog extends StatefulWidget {
   final String message;
   final IconData icon;
   final Duration duration;
+  final Color color; 
 
   AnimatedDialog({
     required this.message,
     required this.icon,
+    required this.color,
     this.duration = const Duration(seconds: 3),
   });
 
@@ -31,7 +33,6 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
     _controller.forward();
 
-    // Start timer to automatically dismiss dialog
     _timer = Timer(widget.duration, () {
       Navigator.of(context).pop();
     });
@@ -55,12 +56,12 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
               Icon(
                 widget.icon,
                 size: 60,
-                color: Colors.red, // You can change the color if needed
+                color: widget.color, 
               ),
               SizedBox(height: 20),
               Text(
                 widget.message,
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 20, fontFamily: 'Roboto'),
               ),
               SizedBox(height: 20),
              
@@ -74,7 +75,7 @@ class _AnimatedDialogState extends State<AnimatedDialog> with SingleTickerProvid
   @override
   void dispose() {
     _controller.dispose();
-    _timer.cancel(); // Cancel the timer to avoid memory leaks
+    _timer.cancel(); 
     super.dispose();
   }
 }

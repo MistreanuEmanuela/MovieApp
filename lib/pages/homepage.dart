@@ -3,10 +3,10 @@ import '../helpers/database_helper.dart';
 import '../models/genre.dart';
 import '../models/movie.dart';
 import 'movie_page.dart'; 
-import '../pages/favorite_actors.dart';
-import '../pages/search_page.dart';
+import 'search_page.dart';
 import '../user_preferinces.dart';
-import '../pages/favorite_items_page.dart';
+import 'favorite_items_page.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -35,10 +35,6 @@ class _HomePageState extends State<HomePage> {
 
   }
 
- 
-
-
-
   Future<void> _fetchGenres() async {
     final genres = await _databaseHelper.getAllGenres();
     setState(() {
@@ -54,8 +50,7 @@ class _HomePageState extends State<HomePage> {
       movies = await _databaseHelper.getMoviesByGenre(_selectedGenre);
     }
     
-    // Filter out duplicates
-    movies = movies.toSet().toList(); // Convert to Set to remove duplicates, then back to List
+    movies = movies.toSet().toList(); 
     
     return movies;
   }
@@ -74,7 +69,7 @@ class _HomePageState extends State<HomePage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: _selectedGenre == 'All' ? Colors.yellow : null,
         ),
-        child: Text('All'),
+        child: const Text('All'),
       ),
     );
 
@@ -98,7 +93,7 @@ class _HomePageState extends State<HomePage> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: buttons.map((button) => Padding(padding: EdgeInsets.symmetric(horizontal: 4.0), child: button)).toList(),
+        children: buttons.map((button) => Padding(padding: const EdgeInsets.symmetric(horizontal: 4.0), child: button)).toList(),
       ),
     );
   }
@@ -108,9 +103,9 @@ class _HomePageState extends State<HomePage> {
       future: _moviesFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+          return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
         } else {
           final movies = snapshot.data!;
           return ListView(
@@ -122,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                   child: Row(
                     children: [
                       MovieItem(movie: movies[i], userId: userId),
-                      SizedBox(width: 8.0), // Adjust spacing between movies if needed
+                      const SizedBox(width: 8.0),
                       if (i + 1 < movies.length) MovieItem(movie: movies[i + 1], userId: userId,),
                     ],
                   ),
@@ -140,37 +135,39 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
   backgroundColor: const Color.fromARGB(255, 2, 28, 70),
   leading: IconButton(
-    icon: Icon(Icons.exit_to_app), // Changed to exit icon
+    icon: const Icon(Icons.exit_to_app), 
     color: Colors.white,
     onPressed: () {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Are you sure you want to disconnect?"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                child: Text("No"),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.pushNamed(context, '/'); // Close the dialog
-                },
-                child: Text("Yes"),
-              ),
-            ],
-          );
+  title: const Center(
+    child: Text("Are you sure you want to disconnect?"),
+  ),
+  actions: <Widget>[
+    TextButton(
+      onPressed: () {
+        Navigator.of(context).pop(); 
+      },
+      child: const Text("No"),
+    ),
+    TextButton(
+      onPressed: () {
+        Navigator.of(context).pop();
+        Navigator.pushNamed(context, '/'); // Close the dialog
+      },
+      child: const Text("Yes"),
+    ),
+  ],
+);
         },
       );
     },
   ),
   actions: [
     IconButton(
-      icon: Icon(Icons.search),
+      icon: const Icon(Icons.search),
       color: Colors.white,
       onPressed: () {
         Navigator.push(
@@ -182,7 +179,7 @@ class _HomePageState extends State<HomePage> {
       },
     ),
     IconButton(
-      icon: Icon(Icons.favorite_outlined),
+      icon: const Icon(Icons.favorite_outlined),
       color: Colors.white,
       onPressed: () {
         Navigator.push(
@@ -195,22 +192,21 @@ class _HomePageState extends State<HomePage> {
     ),
   ],
   title: SizedBox(
-    width: 250, // Adjust this value as needed
+    width: 250, 
      child: Center(
           child: GestureDetector(
             onTap: () {
-              // Navigate to homepage when image is tapped
               Navigator.pushNamed(context, '/homepage');
             },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(width: 50.0), // Adjust this value as needed
+          const SizedBox(width: 50.0), 
           Image.asset(
-            'assets/images/image.png', // Change this to the path of your logo image
-            width: 150.0, // Adjust the width as needed
+            'assets/images/image.png', 
+            width: 150.0, 
           ),
-          SizedBox(width: 0.0), // Adjust this value as needed
+          const SizedBox(width: 0.0), 
         ],
       ),
     ),
@@ -218,27 +214,27 @@ class _HomePageState extends State<HomePage> {
   ),
 ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration:const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/first_page.jpg'), // Replace 'background_image.jpg' with your image asset
+            image: AssetImage('assets/images/first_page.jpg'), 
             fit: BoxFit.cover,
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 16.0),
-                Text(
+                const SizedBox(height: 16.0),
+                const Text(
                   'Top Movies',
                   style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 _buildTopMoviesSection(),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 _buildGenreButtons(),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 Expanded(child: _buildMovieList()),
               ],
             ),
@@ -253,20 +249,20 @@ class _HomePageState extends State<HomePage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SizedBox(
-          height: 260.0, // Height of the favorite movie item
+          height: 260.0, 
           child: FutureBuilder<List<Movie>>(
             future: _movieFavFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
+                return Center(child: Text('Error: ${snapshot.error}', style:const TextStyle(color: Colors.white)));
               } else {
                 final movies = snapshot.data!;
                 if (movies.isNotEmpty) {
                   return PageView.builder(
                     itemCount: movies.length,
-                    physics: BouncingScrollPhysics(), // Custom physics for partial visibility
+                    physics: const BouncingScrollPhysics(), 
                     itemBuilder: (context, index) {
                       final movie = movies[index];
                       return GestureDetector(
@@ -280,21 +276,20 @@ class _HomePageState extends State<HomePage> {
                         },
                         child: Center(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 6.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 6.0),
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
-                                // Image
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10.0),
                                   child: Image.asset(
                                     movie.photoPath,
                                     fit: BoxFit.cover,
-                                    width: MediaQuery.of(context).size.width * 0.85, // Adjusted width for center visibility
-                                    height: 230.0, // Height of the image
+                                    width: MediaQuery.of(context).size.width * 0.85, 
+                                    height: 230.0, 
                                   ),
                                 ),
-                                // Title
+                              
                                 Positioned(
                                   bottom: 10.0,
                                   left: 10.0,
@@ -303,30 +298,30 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       Text(
                                         movie.title,
-                                        style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.white), // Bigger title
+                                        style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.white), // Bigger title
                                       ),
                                       FutureBuilder<List<Genre>>(
                                         future: _databaseHelper.getGenresForMovie(movie.id!),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return SizedBox(); // Return an empty container while waiting for data
+                                            return const SizedBox(); 
                                           } else if (snapshot.hasError) {
-                                            return SizedBox(); // Return an empty container if there's an error
+                                            return const SizedBox(); 
                                           } else {
                                             final genres = snapshot.data!;
                                             return Wrap(
-                                              spacing: 4.0, // Adjust spacing between boxes
-                                              runSpacing: 3.0, // Adjust spacing between rows
+                                              spacing: 4.0,
+                                              runSpacing: 3.0, 
                                               children: genres.map((genre) {
                                                 return Container(
-                                                  padding: EdgeInsets.all(4.0),
+                                                  padding: const EdgeInsets.all(4.0),
                                                   decoration: BoxDecoration(
                                                     color: Colors.grey.withOpacity(0.7),
                                                     borderRadius: BorderRadius.circular(4.0),
                                                   ),
                                                   child: Text(
                                                     genre.name,
-                                                    style: TextStyle(fontSize: 12.0, color: Colors.white),
+                                                    style:const TextStyle(fontSize: 12.0, color: Colors.white),
                                                   ),
                                                 );
                                               }).toList(),
@@ -345,7 +340,7 @@ class _HomePageState extends State<HomePage> {
                     },
                   );
                 } else {
-                  return Center(
+                  return const Center(
                     child: Text(
                       'No favorite movies yet.',
                       style: TextStyle(fontSize: 16.0, color: Colors.white),
@@ -356,7 +351,7 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ),
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
       ],
     );
   }
@@ -370,7 +365,7 @@ void main() {
 
 class MovieItem extends StatefulWidget {
   final Movie movie;
-  final int userId; // Add userId as a parameter
+  final int userId; 
 
   const MovieItem({Key? key, required this.movie, required this.userId}) : super(key: key);
 
@@ -406,9 +401,9 @@ class _MovieItemState extends State<MovieItem> {
         );
       },
       child: Container(
-        margin: EdgeInsets.all(2.0),
+        margin: const EdgeInsets.all(2.0),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7), // Adjust the opacity here
+          color: Colors.white.withOpacity(0.7),
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Stack(
@@ -417,22 +412,22 @@ class _MovieItemState extends State<MovieItem> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  margin: EdgeInsets.only(top: 10.0),
+                  margin: const EdgeInsets.only(top: 10.0),
                   alignment: Alignment.center,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10.0),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Image.asset(
                         widget.movie.photoPath,
                         fit: BoxFit.cover,
-                        width: 160.0, // Fixed width for each movie item
+                        width: 160.0, 
                         height: 220.0,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 10.0),
+                const SizedBox(height: 10.0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
@@ -440,33 +435,33 @@ class _MovieItemState extends State<MovieItem> {
                     children: [
                       Text(
                         widget.movie.title,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 5.0),
+                      const SizedBox(height: 5.0),
                       Text(
                         '${widget.movie.year} | ${widget.movie.duration}',
-                        style: TextStyle(fontSize: 14.0),
+                        style: const TextStyle(fontSize: 14.0),
                       ),
-                      SizedBox(height: 5.0),
+                     const SizedBox(height: 5.0),
                       FutureBuilder<List<Genre>>(
                         future: DatabaseHelper().getGenresForMovie(widget.movie.id ?? 0),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return const CircularProgressIndicator();
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else {
                             final genres = snapshot.data!;
                             final genreNames = genres.map((genre) => genre.name).toList();
-                            final genreString = genreNames.join(', '); // Join genre names with commas
+                            final genreString = genreNames.join(', '); 
                             return SizedBox(
-                              width: 160.0, // Maximum width for genre text
+                              width: 160.0, 
                               child: Text(
-                                '$genreString',
-                                style: TextStyle(fontSize: 14.0),
+                                genreString,
+                                style: const TextStyle(fontSize: 14.0),
                               ),
                             );
                           }
@@ -475,17 +470,17 @@ class _MovieItemState extends State<MovieItem> {
                     ],
                   ),
                 ),
-                SizedBox(height: 10.0),
+                const SizedBox(height: 10.0),
               ],
             ),
-            if (isFavorite ?? false) // Ensure isFavorite is not null before accessing its value
-            Positioned(
+            if (isFavorite) 
+            const Positioned(
                 top: 10,
                 right: 20,
                 child: Icon(
                   Icons.favorite,
                   color: Colors.red,
-                  size: 32, // Adjust the size here, for example
+                  size: 32, 
                 ),
               ),
           ],

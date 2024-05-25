@@ -62,7 +62,8 @@ class _ActorPageState extends State<ActorPage> {
       context: context,
        builder: (context) => AnimatedDialog(
       icon: Icons.favorite, // Pass the icon you want to display
-      message: 'Actor added to favorites!', // Pass the message you want to display
+      message: 'Actor added to favorites!',
+      color: Colors.red, // Pass the message you want to display
     ),
     );
   }
@@ -71,7 +72,8 @@ class _ActorPageState extends State<ActorPage> {
       context: context,
        builder: (context) => AnimatedDialog(
       icon: Icons.heart_broken, // Pass the icon you want to display
-      message: 'Actor deleted from favorites!', // Pass the message you want to display
+      message: 'Actor deleted from favorites!',
+      color: Colors.red,  // Pass the message you want to display
     ),
     );
   }

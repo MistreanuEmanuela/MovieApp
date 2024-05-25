@@ -35,7 +35,7 @@ class _FavoriteActorsPageState extends State<FavoriteActorsPage> {
       future: _actorsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return Center( child: const  CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(
               child: Text('Error: ${snapshot.error}',
