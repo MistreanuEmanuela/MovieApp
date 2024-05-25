@@ -7,7 +7,7 @@ import '../pages/favorite_movies.dart';
 import '../pages/favorite_actors.dart';
 import '../pages/search_page.dart';
 import '../user_preferinces.dart';
-
+import '../pages/favorite_items_page.dart';
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -167,7 +167,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => FavoriteMoviesPage(),
+                  builder: (context) => FavoriteItemsPage(),
                 ),
               );
             },

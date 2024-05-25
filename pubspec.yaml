@@ -39,6 +39,7 @@ dependencies:
   path: ^1.8.0
   path_provider: any
   shared_preferences: ^2.0.8
+  
 
 dev_dependencies:
   flutter_test:
@@ -92,6 +93,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  fonts:
+    - family: ShrikhandRegular
+      fonts:
+        - asset: assets/fonts/Shrikhand-Regular.ttf
 
   assets:
     - assets/images/image.png
@@ -101,3 +106,4 @@ flutter:
     - lib/images/movies/inception.png
     - lib/images/producers/nolan.jpg
     - lib/images/actors/leo.jpg
+

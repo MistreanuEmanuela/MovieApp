@@ -13,37 +13,21 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    routes: {
-        '/register': (context) => RegisterPage(), // Add route for register page
-        '/login':(context) => LoginPage(),
-         '/homepage':(context) => HomePage(),
+      routes: {
+        '/register': (context) => RegisterPage(),
+        '/login': (context) => LoginPage(),
+        '/homepage': (context) => HomePage(),
       },
-        onGenerateRoute: (settings) {
+      onGenerateRoute: (settings) {
         if (settings.name == '/moviepage') {
           final args = settings.arguments as MoviePageArguments;
           return MaterialPageRoute(
@@ -62,15 +46,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -79,89 +54,106 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
- @override
+
+  @override
   void initState() {
     super.initState();
-    initializeApp(); // Call initializeApp() when the widget is initialized
+    initializeApp();
   }
+
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
-void initializeApp() async {
-  await insertInitialData();
-}
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      title: Text(widget.title),
-    ),
-    body: Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/first_page.png'), // Path to your background image
-          fit: BoxFit.cover,
+
+  void initializeApp() async {
+    await insertInitialData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+     
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/first_page.png'),
+            fit: BoxFit.cover,
+          ),
         ),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: <Widget>[
-           
-            SizedBox(height: 20), // Adding some spacing between elements
-              SizedBox(height: 20), // Adding some spacing between elements
-            SizedBox(
-          width: MediaQuery.of(context).size.width * 0.6, // Making the button 60% width
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 5.0), // Adding vertical padding
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/login'); // Navigate to register page
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.yellow, // Setting the button color to yellow
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0), // Adding vertical padding inside the button
-                child: Text('SING UP', style: TextStyle(fontSize: 18)),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "DON'T WAIT",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 42,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const Text(
+                    "Find the best movie to watch",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'ShrikhandRegular',
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 80), // Add space between the texts and buttons
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8, // Make the buttons wider
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/login');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.yellow,
+                          padding: const EdgeInsets.symmetric(vertical: 15.0), // Increase padding
+                        ),
+                        child: const Text('LOGIN', style: TextStyle(fontSize: 20)), // Increase font size
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8, // Make the buttons wider
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5.0),
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.yellow, width: 2), // Add border color
+                          padding: const EdgeInsets.symmetric(vertical: 15.0), // Increase padding
+                        ),
+                        child: const Text(
+                          'REGISTER',
+                          style: TextStyle(fontSize: 20, color: Colors.yellow), // Increase font size and change text color
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 60),
+                ],
               ),
             ),
-          ),
-        ),
-            SizedBox(height: 20), // Adding some spacing between elements
-            SizedBox(
-          width: MediaQuery.of(context).size.width * 0.6, // Making the button 60% width
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 5.0), // Adding vertical padding
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/register'); // Navigate to register page
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.yellow, // Setting the button color to yellow
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0), // Adding vertical padding inside the button
-                child: Text('SING IN', style: TextStyle(fontSize: 18)),
-              ),
-            ),
-          ),
-        ),
           ],
         ),
       ),
-    ),
-
-  );
-}
+    );
+  }
 }
 
 class MoviePageArguments {
