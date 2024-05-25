@@ -98,7 +98,9 @@ flutter:
     - family: ShrikhandRegular
       fonts:
         - asset: assets/fonts/Shrikhand-Regular.ttf
-
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Medium.ttf
   assets:
     - assets/images/image.png
     - assets/images/first_page.png

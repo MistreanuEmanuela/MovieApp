@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/models/movie.dart';
-import './pages/register_page.dart'; // Import the register page
+import './pages/register_page.dart'; 
 import './pages/login_page.dart';
 import './insert_data.dart';
 import './pages/homepage.dart';
@@ -18,10 +17,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 50, 10, 119)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Movie App'),
       routes: {
         '/register': (context) => RegisterPage(),
         '/login': (context) => LoginPage(),
@@ -53,7 +52,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
   @override
   void initState() {
@@ -61,11 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
     initializeApp();
   }
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   void initializeApp() async {
     await insertInitialData();
@@ -93,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     "DON'T WAIT",
                     textAlign: TextAlign.center,
                     style: TextStyle(
+                      fontFamily: 'Roboto',
                       fontSize: 42,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -105,12 +99,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'ShrikhandRegular',
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 175, 175, 175),
                     ),
                   ),
-                  const SizedBox(height: 80), // Add space between the texts and buttons
+                  const SizedBox(height: 80), 
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.8, // Make the buttons wider
+                    width: MediaQuery.of(context).size.width * 0.8, 
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: ElevatedButton(
@@ -119,15 +113,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.yellow,
-                          padding: const EdgeInsets.symmetric(vertical: 15.0), // Increase padding
+                          padding: const EdgeInsets.symmetric(vertical: 15.0),
                         ),
-                        child: const Text('LOGIN', style: TextStyle(fontSize: 20)), // Increase font size
+                        child: const Text('LOGIN', style: TextStyle(fontSize: 20, fontFamily: 'Roboto')), 
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.8, // Make the buttons wider
+                    width: MediaQuery.of(context).size.width * 0.8, 
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: OutlinedButton(
@@ -140,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         child: const Text(
                           'REGISTER',
-                          style: TextStyle(fontSize: 20, color: Colors.yellow), // Increase font size and change text color
+                          style: TextStyle(fontSize: 20, color: Colors.yellow, fontFamily: 'Roboto'), // Increase font size and change text color
                         ),
                       ),
                     ),
