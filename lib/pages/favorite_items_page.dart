@@ -57,12 +57,14 @@ Widget _buildActorList() {
             children: [
               for (int i = 0; i < actors.length; i += 3)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Row(
                     children: [
                       ActorItem(actor: actors[i]),
-                      SizedBox(width: 1.0), // Adjust spacing between movies if needed
+                      SizedBox(width: 4.0), // Adjust spacing between movies if needed
                       if (i + 1 < actors.length) ActorItem(actor: actors[i + 1]),
+                      SizedBox(width: 4.0), // Adjust spacing between movies if needed
+
                       if (i + 2 < actors.length) ActorItem(actor: actors[i + 2]),
 
                     ],
@@ -235,8 +237,8 @@ class ActorItem extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10.0), // Match container's border radius
         child: Container(
-          width: 120.0, 
-          height: 170,// Adjust the width as needed
+          width: 110.0, 
+          height: 150,// Adjust the width as needed
           margin: EdgeInsets.all(2.0),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.7), // Adjust the opacity here
@@ -249,11 +251,11 @@ class ActorItem extends StatelessWidget {
                 margin: EdgeInsets.only(top: 20.0),
                 alignment: Alignment.center,
                 child: CircleAvatar(
-                  radius: 50.0, // Adjust the radius as needed
+                  radius: 45.0, // Adjust the radius as needed
                   backgroundImage: AssetImage(actor.photoPath),
                 ),
               ),
-              SizedBox(height: 15.0),
+              SizedBox(height: 10.0),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
@@ -265,7 +267,7 @@ class ActorItem extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 10.0),
+              SizedBox(height: 2.0),
             ],
           ),
         ),
@@ -312,8 +314,8 @@ class MovieItem extends StatelessWidget {
                       child: Image.asset(
                         movie.photoPath,
                         fit: BoxFit.cover,
-                        width: 160.0, // Fixed width for each movie item
-                        height: 220.0,
+                        width: 145.0, // Fixed width for each movie item
+                        height: 200.0,
                       ),
                     ),
                   ),
@@ -349,7 +351,7 @@ class MovieItem extends StatelessWidget {
                             final genreNames = genres.map((genre) => genre.name).toList();
                             final genreString = genreNames.join(', '); // Join genre names with commas
                             return SizedBox(
-                              width: 160.0, // Maximum width for genre text
+                              width: 140.0, // Maximum width for genre text
                               child: Text(
                                 '$genreString',
                                 style: TextStyle(fontSize: 14.0),

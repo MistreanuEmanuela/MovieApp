@@ -4,6 +4,7 @@ import '../models/user.dart';
 import 'dart:ui';
 import '../user_preferinces.dart';
 import 'package:collection/collection.dart';
+import '../animated_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -15,32 +16,51 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
+void _showAnimatedDialog() {
+  showDialog(
+    context: context,
+    builder: (context) => AnimatedDialog(
+      icon: Icons.expand_circle_down, // Pass the icon you want to display
+      message: 'Login successful!', // Pass the message you want to display
+    ),
+  );
+}
+void _showAnimatedDialogWrong() {
+  showDialog(
+    context: context,
+    builder: (context) => AnimatedDialog(
+      icon: Icons.info_outline_rounded, // Pass the icon you want to display
+      message: 'Username or password wrong!', // Pass the message you want to display
+    ),
+  );
+}
 
-  void _login() async {
-    if (_formKey.currentState!.validate()) {
-      String username = _usernameController.text;
-      String password = _passwordController.text;
+void _login() async {
+  if (_formKey.currentState!.validate()) {
+    String username = _usernameController.text;
+    String password = _passwordController.text;
 
-      List<User> users = await _databaseHelper.users();
-      User? currentUser = users.firstWhereOrNull(
-          (user) => user.username == username && user.password == password);
+    List<User> users = await _databaseHelper.users();
+    User? currentUser = users.firstWhereOrNull(
+        (user) => user.username == username && user.password == password);
 
-      if (currentUser != null) {
-        // Save user ID locally
-        await UserPreferences.saveUserId(currentUser!.id!);
+    if (currentUser != null) {
+      // Save user ID locally
+      await UserPreferences.saveUserId(currentUser.id!);
 
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Login successful!')));
+      _showAnimatedDialog();
+      // Wait for 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
 
-        // Navigate to the home page or another screen after successful login
-        Navigator.pushReplacementNamed(context,
-            '/homepage'); // Replace '/home' with the route name of the desired page
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Invalid username or password')));
-      }
+      // Navigate to the home page or another screen after successful login
+      Navigator.pushReplacementNamed(context, '/homepage'); // Replace '/homepage' with the route name of the desired page
+    } else {
+       _showAnimatedDialogWrong();
+      // Wait for 2 seconds before navigating
+      
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../helpers/database_helper.dart';
 import '../models/user.dart';
+import '../animated_dialog.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -9,6 +10,17 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  
+void _showAnimatedDialogWrong() {
+  showDialog(
+    context: context,
+    builder: (context) => AnimatedDialog(
+      icon: Icons.info_outline_rounded, // Pass the icon you want to display
+      message: 'Account created succesful!', // Pass the message you want to display
+    ),
+  );
+}
+
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -33,7 +45,12 @@ class _RegisterPageState extends State<RegisterPage> {
         password: _passwordController.text ?? '',
       );
       await _databaseHelper.insertUser(user);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('User registered successfully!')));
+      _showAnimatedDialogWrong();
+      // Wait for 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      // Navigate to the home page or another screen after successful login
+      Navigator.pushReplacementNamed(context, '/');  
       _firstNameController.clear();
       _lastNameController.clear();
       _usernameController.clear();
