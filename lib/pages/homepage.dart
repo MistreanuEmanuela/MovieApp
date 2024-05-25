@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../helpers/database_helper.dart';
 import '../models/genre.dart';
 import '../models/movie.dart';
-import 'movie_page.dart';  // Import the new page
-import '../pages/favorite_movies.dart';
+import 'movie_page.dart'; 
 import '../pages/favorite_actors.dart';
 import '../pages/search_page.dart';
 import '../user_preferinces.dart';
@@ -138,54 +137,66 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor:  const Color.fromARGB(255, 2, 28, 70),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: Colors.white, // Set icon color to white
+      appBar:  AppBar(
+      backgroundColor: const Color.fromARGB(255, 2, 28, 70),
+      leading: IconButton(
+        icon: Icon(Icons.exit_to_app), // Changed to exit icon
+        color: Colors.white,
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Are you sure you want to disconnect?"),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    child: Text("No"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                    
+                      Navigator.of(context).pop();
+                      Navigator.pushNamed(context, '/'); // Close the dialog
+                    },
+                    child: Text("Yes"),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.search),
+          color: Colors.white,
           onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SearchPage(),
+              ),
+            );
           },
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            color: Colors.white, // Set icon color to white
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SearchPage (),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.movie),
-            color: Colors.white, // Set icon color to white
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FavoriteItemsPage(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.person_3_rounded),
-            color: Colors.white, // Set icon color to white
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FavoriteActorsPage(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+        IconButton(
+          icon: Icon(Icons.favorite_outlined),
+          color: Colors.white,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FavoriteItemsPage(),
+              ),
+            );
+          },
+        ),
+       
+      ],
+    ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
