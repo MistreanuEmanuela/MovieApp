@@ -29,11 +29,11 @@ class Actor {
   factory Actor.fromMap(Map<String, dynamic> map) {
     return Actor(
       id: map['id'],
-      name: map['name'],
-      bio: map['bio'],
-      photoPath: map['photo_path'],
-      birthdate: map['birtdate'],
-      bibliography: map['bibliography'],
+      name: map['name'] ?? '',
+      bio: map['bio'] ?? '',
+      photoPath: map['photo_path'] ?? '',
+      birthdate: map['birthdate'] ?? '',
+      bibliography: map['bibliography'] ?? '',
     );
   }
 }

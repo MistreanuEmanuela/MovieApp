@@ -5,8 +5,9 @@ import './insert_data.dart';
 import './pages/homepage.dart';
 import './pages/movie_page.dart';
 
-void main() {
+Future<void> main() async {
   runApp(const MyApp());
+  await insertInitialData();
 }
 
 class MyApp extends StatelessWidget {
@@ -69,16 +70,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
+  bool _isInitialized = false; 
   @override
+
   void initState() {
     super.initState();
-    initializeApp();
+    if (!_isInitialized) {
+      initializeApp(); //
+    }
   }
 
-
   void initializeApp() async {
-    // await insertInitialData();
+    setState(() {
+      _isInitialized = true;
+    });
   }
 
   @override

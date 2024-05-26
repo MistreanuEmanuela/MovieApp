@@ -46,7 +46,7 @@ class _MoviePageState extends State<MoviePage> {
   void _showAnimatedDialog() {
     showDialog(
       context: context,
-       builder: (context) => AnimatedDialog(
+       builder: (context) => const AnimatedDialog(
       icon: Icons.favorite, // Pass the icon you want to display
       message: 'Movie added to favorites!',
       color: Colors.red, // Pass the message you want to display
@@ -56,7 +56,7 @@ class _MoviePageState extends State<MoviePage> {
    void _showAnimatedDialogDeleted() {
     showDialog(
       context: context,
-       builder: (context) => AnimatedDialog(
+       builder: (context) => const AnimatedDialog(
       icon: Icons.heart_broken, // Pass the icon you want to display
       message: 'Movie deleted from favorites!',
       color: Colors.red,  // Pass the message you want to display

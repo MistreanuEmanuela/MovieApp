@@ -27,7 +27,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     return openDatabase(
-      join(await getDatabasesPath(), 'movie_app1.db'),
+      join(await getDatabasesPath(), 'movie_app11.db'),
       onCreate: (db, version) async {
         await _createTables(db);
       },
@@ -148,14 +148,15 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> insertRole(Role role) async {
-    final db = await database;
-    await db.insert(
-      'roles',
-      role.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
+Future<int> insertRole(Role role) async {
+  final db = await database;
+  final int id = await db.insert(
+    'roles',
+    role.toMap(),
+    conflictAlgorithm: ConflictAlgorithm.replace,
+  );
+  return id;
+}
 
   Future<void> insertMovieActor(MovieActor movieActor) async {
     final db = await database;
@@ -283,7 +284,7 @@ Future<List<Movie>> moviesByYearDesc() async {
       whereArgs: [actorId, userId],
     );
   }
-  
+
 Future<void> deleteMovie(int id) async {
     final db = await database;
     await db.delete(
@@ -556,5 +557,103 @@ Future<List<Movie>> searchMovies(String query) async {
       return Movie.fromMap(maps[i]);
     });
   }
+Future<Actor> getOrInsertActor(Actor actor) async {
+  if (actor.name == null) {
+    throw ArgumentError('Actor name cannot be null');
+  }
 
+  final db = await database;
+  final List<Map<String, dynamic>> actorMaps = await db.query(
+    'actors',
+    where: 'LOWER(name) = ?',
+    whereArgs: [actor.name.toLowerCase().trim()],
+  );
+
+  if (actorMaps.isNotEmpty) {
+    print('Actor found in database: ${actorMaps.first}');
+    return Actor.fromMap(actorMaps.first);
+  } else {
+    final int insertedActorId = await db.insert(
+      'actors',
+      actor.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+
+    if (insertedActorId == 0) {
+      throw Exception('Failed to insert actor');
+    }
+
+    final List<Map<String, dynamic>> newActorMaps = await db.query(
+      'actors',
+      where: 'id = ?',
+      whereArgs: [insertedActorId],
+    );
+
+    if (newActorMaps.isNotEmpty) {
+      print('Actor inserted and retrieved from database: ${newActorMaps.first}');
+      return Actor.fromMap(newActorMaps.first);
+    } else {
+      throw Exception('Failed to retrieve the newly inserted actor');
+    }
+  }
+}
+
+Future<Producer> getOrInsertProducer(Producer producer) async {
+  final db = await database;
+  final List<Map<String, dynamic>> producerMaps = await db.query(
+    'producers',
+    where: 'name = ?',
+    whereArgs: [producer.name],
+  );
+
+  if (producerMaps.isNotEmpty) {
+    return Producer.fromMap(producerMaps.first);
+  } else {
+    final int insertedProducerId = await db.insert(
+      'producers',
+      producer.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+
+    final List<Map<String, dynamic>> newProducerMaps = await db.query(
+      'producers',
+      where: 'id = ?',
+      whereArgs: [insertedProducerId],
+    );
+
+    if (newProducerMaps.isNotEmpty) {
+      return Producer.fromMap(newProducerMaps.first);
+    } else {
+      throw Exception('Failed to insert and retrieve the new producer');
+    }
+  }
+}
+
+Future<Genre> getGenre(String genreName) async {
+  final db = await database;
+  final List<Map<String, dynamic>> genreMaps = await db.query(
+    'genres',
+    where: 'name = ?',
+    whereArgs: [genreName],
+  );
+
+  if (genreMaps.isNotEmpty) {
+    return Genre.fromMap(genreMaps.first);
+  } else {
+    final int insertedGenreId = await db.insert(
+      'genres',
+      {'name': genreName},
+      conflictAlgorithm: ConflictAlgorithm.ignore, // Ignore conflict if genre already exists
+    );
+
+    // Fetch the newly inserted genre to get the complete instance with the ID
+    final List<Map<String, dynamic>> newGenreMaps = await db.query(
+      'genres',
+      where: 'id = ?',
+      whereArgs: [insertedGenreId],
+    );
+
+    return Genre.fromMap(newGenreMaps.first);
+  }
+}
 }
